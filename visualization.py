@@ -48,6 +48,11 @@ class visualization(tk.Tk):
                                             (j + 1) * self.frame_widthScale, (i + 1) * self.frame_heightScale,
                                             fill="white", width=1, outline="gray1")
 
+    def draw_player(self,i,j):
+        self.frame.create_rectangle(j * self.frame_widthScale, i * self.frame_heightScale,
+                                            (j + 1) * self.frame_widthScale, (i + 1) * self.frame_heightScale,
+                                            fill="white", width=1, outline="gray1")
+
     def display_simulation(self):
         self.frame.grid(row=0, column=0)
         self.master.mainloop()
