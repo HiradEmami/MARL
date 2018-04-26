@@ -53,9 +53,19 @@ class world():
         #placing obsticles and the goal on the grid
         self.place_objects(self.goals)
         self.place_objects(self.obstacles)
+        self.place_agents()
 
 
 
+    def place_agents(self):
+        for i in self.agents:
+            foundLocation=False
+            while not(foundLocation):
+                i.positionX = rd.randint(0,self.width-1)
+                i.positionY = rd.randint(0, self.height-1)
+                if(self.board[i.positionY][i.positionX]==0):
+                    self.board[i.positionY][i.positionX] =i.id
+                    foundLocation=True
 
 
 
@@ -99,51 +109,53 @@ class world():
         return False
 
 
-    #function for setting the goals on the grid
+    #function for setting the objects on the grid
     def place_objects(self,object):
-        #for each goal
+        #for each object
         for i in range(len(object)):
             #calculate the margin that is half of the size of the goal
-            margin_width = math.ceil(object[i].width/2)
-            margin_height = math.ceil(object[i].height/2)
+            margin_width = object[i].width
+            margin_height = object[i].height
             #random position of object
             if(self.Mode == "Random"):
+                #placeholder variable to know whether we found an acceptable location for the object
                 foundLocation=False
+                #while we did not find an acceptable location we try new random places on board
                 while not (foundLocation):
+                    #the (x,y) saved in the object classes indicate the top -left cell coordinate
+                    #this means (x,y) of an agent with width and height 1 , is just the one cell it occupies
+                    #however, (x,y) of a wall with hight = width = 2 is the coordinate of the top left cell of
+                    #the 4 cells in the 2x2 matricies it occupies
+                    #Here we first select a random position for the object's starting cell
                     object[i].x = rd.randint(0, self.width - 1)
                     object[i].y = rd.randint(0, self.height - 1)
+                    #we call the "location acceptable" function that takes the random positions and calculated margine
+                    #and determine it is possible for the object to be placed there . It returns a boolean accordingly
                     test=self.location_acceptable(margin_width,margin_height,object[i].x, object[i].y)
+                    #if the location was acceptable:
                     if(test):
+                        #set the boolean to true
                         foundLocation=True
-
-                        for e in range(object[i].y,object[i].y+margin_height):
-                            for q in range(object[i].x, object[i].x + margin_width):
+                        #The cell we have is the top left cell from the object, thus we have to fill out also the other
+                        #cells. We use loop to cover the
+                        for e in range(object[i].y,object[i].y+object[i].height+1):
+                            for q in range(object[i].x, object[i].x + object[i].width+1):
                                 self.board[e][q] = object[i].id
             else:
                 test = self.location_acceptable(margin_width, margin_height, object[i].x, object[i].y)
                 if (test):
-
                     self.board[object[i].y][object[i].x]=object[i].id
-                    print((margin_height,margin_width))
-                    for e in range(object[i].y, object[i].y + margin_height+1):
-                        print(e)
-                        for q in range(object[i].x, object[i].x + margin_width+1):
-                            print(q)
+                    for e in range(object[i].y, object[i].y + margin_height):
+                        for q in range(object[i].x, object[i].x + margin_width):
                             self.board[e][q] = object[i].id
-                            print(self.board[e][q])
                 else:
                     print("There is an Error in the location of objects.")
 
 
 
-
-
-
-
-
     #function to test if the margines cross the border of the grid
     def margin_acceptable(self,sizeX,sizeY,positionX,positionY):
-        if positionX+sizeX<self.width and positionY + sizeY < self.height:
+        if positionX+sizeX<self.width+1 and positionY + sizeY < self.height+1:
             return True
         return False
 
@@ -152,12 +164,14 @@ class world():
         #we first check if the position of the
         margin_test=self.margin_acceptable(sizeX,sizeY,positionX,positionY)
         if not(margin_test):
+            print("The location is exceeds the board. This selected location is not acceptable", (positionX, positionY))
             return False
         else:
             #even if the margines are acceptable, the tiles have to be empty for the object to occupy.
             #The easiest way to know if all the cells are empty is checking whether the sum of that patch is zero
-            Sum = sum(sum(self.board[positionY:positionY+sizeY+1, positionX:positionX+sizeX+1]))
+            Sum = sum(sum(self.board[positionY:positionY+sizeY, positionX:positionX+sizeX]))
             if Sum != 0:
+                print("The location is occupied. This selected location is not acceptable",(positionX,positionY))
                 return False
         return True
 

@@ -2,11 +2,13 @@ __author__='Hirad Emami Alagha'
 
 import numpy as np
 import matplotlib.ticker as plticker
+import random as rd
 import world as wd
 import agent
 from worldObject import *
 from matplotlib import pyplot as plt
 from matplotlib import colors
+
 
 
 
