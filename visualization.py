@@ -43,19 +43,38 @@ class visualization(tk.Tk):
     def render(self):
         for i in range(self.world.height):
             for j in range(self.world.width):
+                type=self.set_type(self.world.board[i][j])
+                self.draw_cell(type,i,j)
 
-                self.frame.create_rectangle(j * self.frame_widthScale, i * self.frame_heightScale,
-                                            (j + 1) * self.frame_widthScale, (i + 1) * self.frame_heightScale,
-                                            fill="white", width=1, outline="gray1")
-
-    def draw_player(self,i,j):
+    def draw_cell(self,argType,i,j):
+        color=self.set_color(argType)
         self.frame.create_rectangle(j * self.frame_widthScale, i * self.frame_heightScale,
-                                            (j + 1) * self.frame_widthScale, (i + 1) * self.frame_heightScale,
-                                            fill="white", width=1, outline="gray1")
+                                    (j + 1) * self.frame_widthScale, (i + 1) * self.frame_heightScale,
+                                    fill=color, width=1, outline="gray1")
+
+    def set_color(self,argType):
+        colors = {
+            "agent": "light sky blue",
+            "obstacle": "black",
+            "goal": "green",
+            "empty": "white"
+        }
+        return colors.get(argType,"white")
+
+    def set_type(self,argValue):
+        if argValue<0:
+            return "obstacle"
+        elif argValue == 0:
+            return "empty"
+        elif argValue>0 and argValue<100:
+            return "agent"
+        elif argValue > 99:
+            return "goal"
 
     def display_simulation(self):
         self.frame.grid(row=0, column=0)
-        self.master.mainloop()
+        self.master.update()
+        self.draw_cell("goal", 2, 1)
 
     def createWidgets(self):
         self.QUIT = Button(self)
