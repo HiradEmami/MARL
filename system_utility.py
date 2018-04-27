@@ -29,17 +29,22 @@ def save_world(argWorldName,board, obstacles):
             os.makedirs(outputDirect)
         else:
             print("The new world is saved in MARL/: " + outputDirect)
+        #call function to save the world file
+        save_grid(outputDirect=outputDirect,board=board)
 
-        #saving the main grid
-        file_1 = open(outputDirect+"/world.txt", 'w')
-        #the primary loop for grid
-        for i in range(len(board)):
-            for j in range(len(board[i])):
-                #writing the values of cells
-                file_1.write(str(board[i,j])+" ")
-            file_1.write("\n")
-        #closing the file
-        file_1.close()
+
+#the save function that specifically saves the world, this function is also used for visualization
+def save_grid(outputDirect,board):
+    # saving the main grid
+    file_1 = open(outputDirect + "/world.txt", 'w')
+    # the primary loop for grid
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            # writing the values of cells
+            file_1.write(str(board[i, j]) + " ")
+        file_1.write("\n")
+    # closing the file
+    file_1.close()
 
 
 

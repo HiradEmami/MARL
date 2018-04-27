@@ -1,8 +1,9 @@
 import world as wd
 from worldObject import *
-import agent
+import agent,os
 import visualization_tk
 from tkinter import *
+import time,random
 
 
 initial=True
@@ -31,6 +32,35 @@ if initial:
     world = wd.world("Create")
     world.createWorld(argWidth=10, argHeigth=15, argObstacleInfo=obstacles, argAgentInfo=agents, goalInfo=goals)
     print(world.board)
+    world.saveWorld(argWorldName="test")
+    print("hello")
+    test=True
+    counter = 0
+
+    while(test):
+
+        counter=random.randint(0,3)
+        if counter==0:
+            counter +=1
+            time.sleep(0.5)
+        elif counter == 1:
+            world.try_move_left(agents[4])
+            world.saveWorld(argWorldName="test")
+            time.sleep(0.5)
+        elif counter == 2:
+            world.try_move_up(agents[4])
+            world.saveWorld(argWorldName="test")
+            time.sleep(0.5)
+        else:
+            world.try_move_right(agents[4])
+            world.saveWorld(argWorldName="test")
+            time.sleep(0.5)
+
+
+
+
+
+
 
 
 
