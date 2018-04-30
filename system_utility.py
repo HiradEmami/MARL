@@ -46,6 +46,17 @@ def save_grid(outputDirect,board):
     # closing the file
     file_1.close()
 
+def save_info(outputDirect,agents,obsticals,goals,world):
+    # saving the main info file
+    file = open(outputDirect + "/info.txt", 'w')
+    # the primary loop for basic information
+    file.write(str(len(agents))+" "+str(len(obstacle))+" "+str(len(goals)))
+    file.write("\n")
+    file.write(str(world.height)+" "+str(world.height))
+    
+    # closing the file
+    file.close()
+
 
 
 # PRIVATE function for importing the world file and converting it to matrix
@@ -102,3 +113,26 @@ def calculateTheScale(height,width):
     # if the world's width is bigger than the hight
     else:
         return 700 / width, 400 / height
+
+#function to that takes a 2d list and returns a flat array
+def flatten_list(argList):
+    #flat arraty
+    flat_array=[]
+    for i in range(len(argList)):
+        for j in range(len(argList[0])):
+            flat_array.append(argList[i][j])
+    #returning the 1d Flattened array
+    return flat_array
+
+#function that takes the flattened array and returns the 2d array
+def convert_2d(argFlatList,argWidth,argHeight):
+    list=np.zeros((argHeight,argWidth),dtype=int)
+    if (argWidth*argHeight==len(argFlatList)):
+        counter = 0
+        for i in range(0, argHeight):
+            for j in range(0, argWidth):
+                list[i][j] = argFlatList[counter]
+                counter += 1
+    else:
+        print("The list is not convertable to 2d")
+    return list
