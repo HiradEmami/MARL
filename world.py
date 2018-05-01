@@ -23,13 +23,6 @@ class world():
     def __init__(self,argCreationMode):
         self.Mode = argCreationMode
 
-
-
-
-
-
-
-
     def loadWolrd(self,argName):
         load_world(argName)
 
@@ -40,7 +33,7 @@ class world():
     def generate_random_world(self):
         print("fse")
 
-    def createWorld(self,argWidth,argHeigth, argObstacleInfo, argAgentInfo, goalInfo):
+    def createWorld(self,argWidth,argHeigth, argObstacleInfo, argAgentInfo, goalInfo,argAgent_Location_Constraint=True):
         #World Parameters
         self.width = argWidth
         self.height = argHeigth
@@ -53,17 +46,19 @@ class world():
         #placing obsticles and the goal on the grid
         self.place_objects(self.goals)
         self.place_objects(self.obstacles)
-        self.place_agents()
+        self.place_agents(argMargine_constraint=argAgent_Location_Constraint)
 
-    def place_agents(self):
-        for i in self.agents:
-            foundLocation=False
-            while not(foundLocation):
-                i.positionX = rd.randint(0,self.width-1)
-                i.positionY = rd.randint(0, self.height-1)
-                if(self.board[i.positionY][i.positionX]==0):
-                    self.board[i.positionY][i.positionX] =i.id
-                    foundLocation=True
+    def place_agents(self,argMargine_constraint=True):
+        if argMargine_constraint:
+            for i in self.agents:
+                foundLocation = False
+                while not (foundLocation):
+                    i.positionX = rd.randint(0, self.width - 1)
+                    i.positionY = rd.randint(0, self.height - 1)
+                    if (self.board[i.positionY][i.positionX] == 0):
+                        self.board[i.positionY][i.positionX] = i.id
+                        foundLocation = True
+
 
     def move_up(self,argPlayer):
         print("up")
@@ -112,10 +107,6 @@ class world():
             self.move_right(argAgent)
             self.agents[index].positionX +=1
 
-
-
-
-
     def find_object_index(self,object,list):
         for i in range(len(list)):
             if list[i].id == object.id:
@@ -156,7 +147,6 @@ class world():
             print("The test was not successful. Missing Obstacle!")
         #if either one of the objects were missing this function will invalidate the board
         return False
-
 
     #function for setting the objects on the grid
     def place_objects(self,object):
@@ -200,8 +190,6 @@ class world():
                 else:
                     print("There is an Error in the location of objects.")
 
-
-
     #function to test if the margines cross the border of the grid
     def margin_acceptable(self,sizeX,sizeY,positionX,positionY):
         if positionX+sizeX<self.width+1 and positionY + sizeY < self.height+1:
@@ -223,9 +211,6 @@ class world():
                 print("The location is occupied. This selected location is not acceptable",(positionX,positionY))
                 return False
         return True
-
-
-
 
     def add_agents(self):
         print("fuck")
@@ -286,7 +271,6 @@ class world():
             #Remove Agent from the board
             self.board[x,y]= 0
             return True,x,y
-
 
 if __name__=='__main__':
     print("__________EXAMPLE WORLD_________")

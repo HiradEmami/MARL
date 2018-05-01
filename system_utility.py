@@ -46,13 +46,21 @@ def save_grid(outputDirect,board):
     # closing the file
     file_1.close()
 
-def save_info(outputDirect,agents,obsticals,goals,world):
+def save_info(outputDirect,agents,obstacles,goals,world):
     # saving the main info file
     file = open(outputDirect + "/info.txt", 'w')
     # the primary loop for basic information
-    file.write(str(len(agents))+" "+str(len(obstacle))+" "+str(len(goals)))
+    file.write(str(len(agents))+" "+str(len(obstacles))+" "+str(len(goals)))
     file.write("\n")
     file.write(str(world.height)+" "+str(world.height))
+    file.write("\n")
+
+    for i in range(len(agents)):
+        file.write(str(agents[i].id)+"\n")
+
+    for i in range(len(obstacles)):
+        file.write(str(obstacles[i].id)+" "+str(obstacles[i].id)+" "+str(obstacles[i].id)+" "+str(obstacles[i].id)+"\n")
+
     
     # closing the file
     file.close()
