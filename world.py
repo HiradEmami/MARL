@@ -82,31 +82,6 @@ class world():
         self.board[i,j-1]=argPlayer.id
 
 
-    def try_move_up(self,argAgent):
-        index=self.find_object_index(argAgent,self.agents)
-        if (self.agents[index].positionY-1)>-1 and self.board[argAgent.positionY-1,argAgent.positionX] ==0:
-            print(self.agents[index].positionY -1, self.height, self.board[argAgent.positionY-1, argAgent.positionX])
-            self.move_up(argAgent)
-            self.agents[index].positionY -=1
-    def try_move_down(self,argAgent):
-        index = self.find_object_index(argAgent, self.agents)
-        if (self.agents[index].positionY +1) < self.height and self.board[argAgent.positionY+1, argAgent.positionX] == 0:
-            print(self.agents[index].positionY + 1, self.height, self.board[argAgent.positionY+1, argAgent.positionX])
-            self.move_left(argAgent)
-            self.agents[index].positionY += 1
-    def try_move_left(self,argAgent):
-        index=self.find_object_index(argAgent,self.agents)
-        if (self.agents[index].positionX-1)>-1 and self.board[argAgent.positionY,argAgent.positionX-1] ==0:
-            print(self.agents[index].positionX - 1, self.width, self.board[argAgent.positionY, argAgent.positionX - 1])
-            self.move_left(argAgent)
-            self.agents[index].positionX -=1
-    def try_move_right(self,argAgent):
-        index=self.find_object_index(argAgent,self.agents)
-        if (self.agents[index].positionX+1)<self.width and  self.board[argAgent.positionY,argAgent.positionX+1] ==0:
-            print(self.agents[index].positionX+1, self.width, self.board[argAgent.positionY, argAgent.positionX+1])
-            self.move_right(argAgent)
-            self.agents[index].positionX +=1
-
     def find_object_index(self,object,list):
         for i in range(len(list)):
             if list[i].id == object.id:

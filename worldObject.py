@@ -1,5 +1,6 @@
 __author__='Hirad Emami Alagha - S3218139'
 
+
 class obstacle():
     def __init__(self,argType,argWidth, argHight, argX,argY, argId):
         self.type = argType

@@ -4,6 +4,7 @@ from copy import copy
 import numpy as np
 import network as network
 import sys, random
+from system_utility import *
 
 
 class agent():
@@ -26,22 +27,29 @@ class agent():
         self.vision = []
         #the State of the player can be:
         #   1) "initialized"
-        #   3) "searching"
-        #   2) "Finished"
+        #   3) "selecting next action"
+        #   4) "waiting for the action"
+        #   2) "arrived"
         self.state="initialized"
-        #mode defines if the agent is training or testing
+        #mode defines if the agent is training or testing or developer
         self.mode = argMode
 
     #The Create_brain function creates the primary neural netwokr that the agent is using the given
     #parameters. The function is called after creation of the agent
-    def create_brain(self,argBoard,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation):
+    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation,argInputLayerSize,argOutputSize=4):
         #the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
+        #the size of input and output layers
+        self.input_size=argInputLayerSize
+        self.output_size=argOutputSize
         #defining the network
-        self.NN = network.NeuralNet(64, self.hidden_size, 4, self.learning_rate, self.hidden_activation, self.out_activation)
+        self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate, self.hidden_activation, self.out_activation)
+        #the memory of agent's moves as a dictionary with capacity of 100 moves
+        self.memory = [dict() for x in range(100)]  # Containing all moves it played during the game
+        self.move_count = 0
 
     #Set_margines function updates the extent that agent sees from the board
     def set_margines(self):
@@ -49,14 +57,104 @@ class agent():
         self.marginY = (int)((self.vision_y - 1) / 2)
 
     #update_the vision of player
-    def update_vision(self,argBoard):
-        #calculating the boundaries
-        y0 = max(0, self.positionY - self.marginY)
-        y1 = min(len(argBoard), self.positionY + self.marginY + 1)
-        x0 = max(0, self.positionX - self.marginx)
-        x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
-        #calculating the boundaries
-        return argBoard[y0:y1, x0:x1]
+    def get_observable_board(self,argBoard):
+        if self.mode =="developer":
+            return argBoard
+        else:
+            #calculating the boundaries
+            y0 = max(0, self.positionY - self.marginY)
+            y1 = min(len(argBoard), self.positionY + self.marginY + 1)
+            x0 = max(0, self.positionX - self.marginx)
+            x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
+            #calculating the boundaries
+            return argBoard[y0:y1, x0:x1]
 
-    def move(self,argWGrid):
-        print("will be added")
+
+    #the function for selecting the next action
+    def make_decision(self,argWGrid):
+        #The portion of the grid that is observed by the agent currently, will be passed as argWGrid
+        #This matrix is flattened to be used as the input layer of the Q-learning network
+        self.input_layer=flatten_list(argWGrid)
+        self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
+
+    def try_move_up(self, argboard):
+        if (self.positionY - 1) > -1:
+            if argboard[self.positionY - 1, self.positionX] == 0:
+                # self.move_up(argAgent)
+                # self.agents[index].positionY -=1
+                return True, "empty", "up"
+            elif argboard[self.positionY - 1, self.positionX] > 99:
+                return True, "goal", "up"
+            elif argboard[self.positionY - 1, self.positionX] < 0:
+                return False, "obstacle", "up"
+            else:
+                return False, "occupied", "up"
+        else:
+            return False, "out_of_range", "up"
+
+    def try_move_down(self, argboard):
+        height=len(argboard)
+        if (self.positionY + 1) < height:
+            if argboard[self.positionY + 1, self.positionX] == 0:
+                # self.move_left(argAgent)
+                # self.agents[index].positionY += 1
+                return True, "empty", "down"
+            elif argboard[self.positionY + 1, self.positionX] > 99:
+                return True, "goal", "down"
+            elif argboard[self.positionY + 1, self.positionX] < 0:
+                return False, "obstacle", "down"
+            else:
+                return False, "occupied", "down"
+        else:
+            return False, "out_of_range", "down"
+
+    def try_move_left(self, argboard):
+        if (self.positionX - 1) > -1:
+            if argboard[self.positionY, self.positionX - 1] == 0:
+                # self.move_left(argAgent)
+                # self.agents[index].positionX -=1
+                return True, "empty", "left"
+            elif argboard[self.positionY, self.positionX - 1] > 99:
+                return True, "goal", "left"
+            elif argboard[self.positionY, self.positionX - 1] <0:
+                return False, "obstacle", "left"
+            else:
+                return False, "occupied", "left"
+        else:
+            return False, "out_of_range", "left"
+
+    def try_move_right(self, argboard):
+        width=len(argboard[0])
+        if (self.positionX + 1) < width:
+            if argboard[self.positionY, self.positionX + 1] == 0:
+                # self.move_right(argAgent)
+                # self.agents[index].positionX +=1
+                return True, "empty", "right"
+            elif argboard[self.positionY, self.positionX + 1] > 99:
+                return True, "goal", "right"
+            elif argboard[self.positionY, self.positionX + 1] < 0:
+                return False, "obstacle", "right"
+            else:
+                return False, "occupied", "right"
+        else:
+            return False, "out_of_range", "right"
+
+    # evaluating each move
+    def get_possible_moves(self,argBoard):
+        # check all 4 actions
+        moves = []
+        moves.append(self.try_move_up(argBoard))
+        moves.append(self.try_move_down(argBoard))
+        moves.append(self.try_move_left(argBoard))
+        moves.append(self.try_move_right(argBoard))
+        # list of acceptable and rejected moves
+        acceptable = []
+        rejected = []
+        # filling up the lists
+        for i in moves:
+            if i[0]:
+                acceptable.append(i)
+            else:
+                rejected.append(i)
+        # returning the acceptable and rejected moves
+        return acceptable, rejected

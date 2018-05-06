@@ -110,7 +110,7 @@ if __name__ == '__main__':
     t_start = time.time()
     num_steps = 50
 
-    nn = NeuralNet(2, 10, 1, learning_rate=.1)
+    nn = NeuralNet(2, 10, 1, learning_rate=.1,hidden_activation="sigmoid",out_activation="linear")
 
     # XOR
     x = [[0, 0], [0, 1], [1, 0], [1, 1]]
