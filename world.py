@@ -11,7 +11,7 @@ import os
 from system_utility import *
 from tkinter import *
 from worldObject import *
-
+from copy import copy
 
 class world():
 
@@ -33,6 +33,7 @@ class world():
     def generate_random_world(self):
         print("fse")
 
+    #creating the world manually
     def createWorld(self,argWidth,argHeigth, argObstacleInfo, argAgentInfo, goalInfo,argAgent_Location_Constraint=True):
         #World Parameters
         self.width = argWidth
@@ -47,17 +48,26 @@ class world():
         self.place_objects(self.goals)
         self.place_objects(self.obstacles)
         self.place_agents(argMargine_constraint=argAgent_Location_Constraint)
+        #taking a copy of the world
+        self.default_board = copy(self.board)
+
 
     def place_agents(self,argMargine_constraint=True):
         if argMargine_constraint:
             for i in self.agents:
                 foundLocation = False
                 while not (foundLocation):
+                    #picking a random position of the agent
                     i.positionX = rd.randint(0, self.width - 1)
                     i.positionY = rd.randint(0, self.height - 1)
                     if (self.board[i.positionY][i.positionX] == 0):
+                        #updating the board
                         self.board[i.positionY][i.positionX] = i.id
+                        #setting the default value for the agents
+                        i.set_default_positions()
                         foundLocation = True
+
+
 
 
     def move_up(self,argPlayer):
@@ -81,7 +91,7 @@ class world():
         self.board[i,j]=0
         self.board[i,j-1]=argPlayer.id
 
-
+    #a search function that returns the index of an object in a list
     def find_object_index(self,object,list):
         for i in range(len(list)):
             if list[i].id == object.id:
@@ -186,9 +196,6 @@ class world():
                 print("The location is occupied. This selected location is not acceptable",(positionX,positionY))
                 return False
         return True
-
-    def add_agents(self):
-        print("fuck")
 
     #function for searching objects on the board
     def search_for_object(self,argObject):

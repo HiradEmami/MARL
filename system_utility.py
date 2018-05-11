@@ -88,7 +88,7 @@ def read_world(argFile):
 
 #the main load utility function: as the argument it takes the "worldFolder" name. This can be either :
 #   1) Just the given world name like "world1"
-#   2) Or with the complete format of
+#   2) Or with the complete format of world_worldName
 def load_world(worldFOlder):
     #if the user has given only the name
     if not(worldFOlder.startswith("world_")):

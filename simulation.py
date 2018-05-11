@@ -26,8 +26,10 @@ class simulation():
     def do_one_step(self):
         for i in self.world.agents:
             if not  (i.state=="arrived"):
-                i.move(argWorld=self.world)
+                #i.move(argWorld=self.world)
+                print(2)
 
+    #The function for counting the number of remaining agents on the board
     def number_remaining_agents(self):
         count=0
         for i in self.world.agents:
