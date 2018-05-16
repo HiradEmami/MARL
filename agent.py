@@ -6,6 +6,10 @@ import network as network
 import sys, random
 from system_utility import *
 
+
+#TODO: I should add the halt move properly to the network and every other function
+#TODO: I should make the functions for performing the moves properly
+
 class agent():
     #An agent is initialized using:
     #   1)   An integer "id"
@@ -55,7 +59,7 @@ class agent():
 
     #The Create_brain function creates the primary neural netwokr that the agent is using the given
     #parameters. The function is called after creation of the agent
-    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation,argOutputSize=4):
+    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation,argOutputSize=5):
         #the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
@@ -100,7 +104,10 @@ class agent():
         #The portion of the grid that is observed by the agent currently, will be passed as argWGrid
         #This matrix is flattened to be used as the input layer of the Q-learning network
         observabl_grid = self.get_observable_board(argBoard=argWGrid)
-        self.input_layer=flatten_list(argWGrid)
+        obstacle_board = self.get_obstacle_grid(argGrid=observabl_grid)
+        agent_board= self.get_agent_grid(argGrid=observabl_grid)
+        goal_board= self.get_goal_grid(argGrid=observabl_grid)
+        self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
         #the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1
@@ -217,6 +224,8 @@ class agent():
             return 2
         elif argMove == "right":
             return 3
+        elif argMove == "halt":
+            return 4
 
     #function that takes an index of output layer and returns the corresponding move
     def index_to_move(self,argIndex):
@@ -228,6 +237,8 @@ class agent():
             return "left"
         elif argIndex == 3:
             return "right"
+        elif argIndex == 4:
+            return "halt"
 
 
 
@@ -317,3 +328,50 @@ class agent():
         return acceptable, rejected
 
 
+    def get_obstacle_grid(self,argGrid):
+        for i in range(len(argGrid)):
+            for j in range(len(argGrid[0])):
+                if argGrid[i][j]<0:
+                    argGrid[i][j]=1
+                else:argGrid[i][j]=0
+        return argGrid
+
+
+    def get_goal_grid(self,argGrid):
+        for i in range(len(argGrid)):
+            for j in range(len(argGrid[0])):
+                if argGrid[i][j]>99:
+                    argGrid[i][j]=1
+                else:
+                    argGrid[i][j]=0
+        return argGrid
+
+    def get_agent_grid(self,argGrid):
+        for i in range(len(argGrid)):
+            for j in range(len(argGrid[0])):
+                if argGrid[i][j]>0 and argGrid[i][j]<100:
+                    argGrid[i][j]=1
+                else:
+                    argGrid[i][j]=0
+        return argGrid
+
+    def shape_input_layer(self,argObstacleList, argGoalList, argAgnetList):
+        if not (len(argAgnetList) == len(argGoalList)) or not (len(argGoalList) == len(argObstacleList)):
+            print("ERROR! The Sizes of The Lists Does not Match")
+        else:
+            counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+2
+            result_list = []
+            for i in argObstacleList:
+                result_list.append(i)
+            for j in argGoalList:
+                result_list.append(j)
+            for k in argAgnetList:
+                result_list.append(k)
+
+            result_list.append(self.positionX)
+            result_list.append(self.positionY)
+
+            if not len(result_list) == counter:
+                print("Failed to shape Input layer")
+            else:
+                return result_list

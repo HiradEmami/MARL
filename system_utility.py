@@ -43,7 +43,7 @@ def save_grid(outputDirect,board):
     for i in range(len(board)):
         for j in range(len(board[i])):
             # writing the values of cells
-            file_1.write(str(board[i, j]) + " ")
+            file_1.write(str(board[i] [j]) + " ")
         file_1.write("\n")
     # closing the file
     file_1.close()
@@ -105,8 +105,7 @@ def load_world(worldFOlder):
     input_files= []
     for i, file in enumerate(os.listdir(path)):
         if file.endswith('.txt'):
-            inputFile=  open(path+"/"+file, 'r')
-
+            inputFile=  path+"/"+file
             input_files.append(inputFile)
 
     print("_________Files Imported_________")

@@ -138,6 +138,7 @@ class world():
         #for each object
         for i in range(len(object)):
             #calculate the margin that is half of the size of the goal
+            print(object[i].id)
             margin_width = object[i].width
             margin_height = object[i].height
             #random position of object
