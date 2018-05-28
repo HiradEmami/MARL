@@ -13,6 +13,8 @@ from tkinter import *
 from worldObject import *
 from copy import copy
 
+
+
 class world():
 
     #there are three modes for the world:

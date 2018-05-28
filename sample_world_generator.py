@@ -40,6 +40,7 @@ class worldGenrator():
         return self.world
 
 
+
     def print(self,list):
         for i in list:
             print(i.id)

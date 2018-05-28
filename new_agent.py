@@ -1,10 +1,9 @@
 __author__ = 'Hirad Emami Alagha - s3218139'
 
-import copy
+from copy import copy
 import numpy as np
 import network as network
-import sys
-import random
+import sys, random
 
 
 
@@ -16,7 +15,7 @@ class agent():
     #   1)   An integer "id"
     #   2)   The Extent of it's vision = (argVisionY, argVisionX)  #The default value is set at 5
     #   3)   Mode = that can be training, testing
-    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=0.1):
+    def __init__(self,argId,argVisionX=5,argVisionY=5,argMode="train",argStepCost=0.1):
         #the position of the agent on grid
         self.positionX=0
         self.positionY=0
@@ -58,10 +57,6 @@ class agent():
     def set_default_positions(self):
         self.default_positionY = self.positionY
         self.default_positionX = self.positionX
-
-    def set_position(self,posY,posX):
-        self.positionX= posX
-        self.positionY=posY
 
     #The Create_brain function creates the primary neural netwokr that the agent is using the given
     #parameters. The function is called after creation of the agent
@@ -122,8 +117,8 @@ class agent():
         #THis means no attempt at back prop if it is the first step
         if not(self.mode == "testing") and not (self.state == "initialized"):
             #we first obtain our previous input layer by copying the input of NN
-            previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
-            previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
+            previous_input_layer = copy(self.NN.input_layer)  # previous state (s0)
+            previous_output_layer = copy(self.NN.output_layer)  # previous expected reward (r1)
 
             # Obtain network's current output (a1)
             _, new_confidence, _ = self.get_best_move()
@@ -161,7 +156,7 @@ class agent():
     # Update the weights
     def final_update(self, opponent_score, own_score):
         if self.mode == "train":
-            corrected_output_layer = copy.copy(self.NN.output_layer)
+            corrected_output_layer = copy(self.NN.output_layer)
             if opponent_score < own_score:
                 corrected_output_layer[self.previous_index] = 1
             elif opponent_score == own_score:
@@ -175,7 +170,7 @@ class agent():
     # Using a forward pass, find the best move along with its index and confidence (= output node value)
     def get_best_move(self):
         # first we obtain the network's output using forward propogation given the input layer
-        network_rewards = copy.copy(self.NN.forward_propagation(self.input_layer))
+        network_rewards = copy(self.NN.forward_propagation(self.input_layer))
         # obtain the output nodes (rewards) corresponding with legal moves
         #this returns two list :
         #  1) the options =(moves, score) eg, [('up',5),('left',4)]
@@ -189,7 +184,7 @@ class agent():
     #function that returns a list of confidence
     def get_move_options(self,argOutputlayer):
         #we first take a copy of the output layer
-        output=copy.copy(argOutputlayer)
+        output=copy(argOutputlayer)
         #checking if the output layer's size matches what we specified
         if not (len(output) ==self.output_size):
             print("ERROR!!! OUTPUT LAYER DOES NOT HAVE ACCEPTABLE SIZE")
@@ -345,8 +340,7 @@ class agent():
                 if argGrid[i][j]<0:
                     argGrid[i][j]=1
                 else:argGrid[i][j]=0
-        result = self.flatten_list(argGrid)
-        return result
+        return argGrid
 
 
     def get_goal_grid(self,argGrid):
@@ -356,8 +350,7 @@ class agent():
                     argGrid[i][j]=1
                 else:
                     argGrid[i][j]=0
-        result = self.flatten_list(argGrid)
-        return result
+        return argGrid
 
     def get_agent_grid(self,argGrid):
         for i in range(len(argGrid)):
@@ -369,8 +362,7 @@ class agent():
                         argGrid[i][j] = 1
                 else:
                     argGrid[i][j]=0
-        result=self.flatten_list(argGrid)
-        return result
+        return argGrid
 
     def shape_input_layer(self,argObstacleList, argGoalList, argAgnetList):
         if not (len(argAgnetList) == len(argGoalList)) or not (len(argGoalList) == len(argObstacleList)):
@@ -392,26 +384,3 @@ class agent():
                 print("Failed to shape Input layer")
             else:
                 return result_list
-
-    # function to that takes a 2d list and returns a flat array
-    def flatten_list(self,argList):
-        # flat arraty
-        flat_array = []
-        for i in range(len(argList)):
-            for j in range(len(argList[0])):
-                flat_array.append(argList[i][j])
-        # returning the 1d Flattened array
-        return flat_array
-
-    # function that takes the flattened array and returns the 2d array
-    def convert_2d(self,argFlatList, argWidth, argHeight):
-        list = np.zeros((argHeight, argWidth), dtype=int)
-        if (argWidth * argHeight == len(argFlatList)):
-            counter = 0
-            for i in range(0, argHeight):
-                for j in range(0, argWidth):
-                    list[i][j] = argFlatList[counter]
-                    counter += 1
-        else:
-            print("The list is not convertable to 2d")
-        return list

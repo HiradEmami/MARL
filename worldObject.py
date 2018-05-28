@@ -18,11 +18,14 @@ class goal():
         self.x = argX
         self.y = argY
         self.id = argId
-        self.num_agent= 0
+        self.num_agent = 0
 
     def set_new_position(self,argX,argY):
         self.x= argX
         self.y = argY
+
+    def reset_goal(self):
+        self.num_agent = 0
 
     def increment_agents(self):
         self.num_agent += 1
