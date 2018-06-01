@@ -16,10 +16,10 @@ class agent():
     #   1)   An integer "id"
     #   2)   The Extent of it's vision = (argVisionY, argVisionX)  #The default value is set at 5
     #   3)   Mode = that can be training, testing
-    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=0.1):
+    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=0.1,argPosX=0,argPosY=0):
         #the position of the agent on grid
-        self.positionX=0
-        self.positionY=0
+        self.positionX=argPosX
+        self.positionY=argPosY
         #placeholder for the initial position
         self.default_positionX=0
         self.default_positionY=0
@@ -43,6 +43,8 @@ class agent():
         self.mode = argMode
         #counter of number of moves
         self.move_count = 0
+        #cost of every action
+        self.step_cost = argStepCost
 
     #the function to reset the agent back to the initial state to start the simulation again
     def reset_agent(self):

@@ -14,7 +14,7 @@ from worldObject import *
 from copy import copy
 
 
-
+#TODO: must create a refresh method
 class world():
 
     #there are three modes for the world:
@@ -26,26 +26,30 @@ class world():
         self.Mode = argCreationMode
 
     def loadWolrd(self,argName):
-        load_world(argName)
+        self.board, self.width, self.height, self.agents, self.obstacles, self.goals = load_world(argName)
+        print(self.height)
+        self.default_board = copy(self.board)
+
 
     def saveWorld(self,argWorldName):
-        save_world(argWorldName,self.board,self.obstacles)
+        save_world(argWorldName,width=self.width,height=self.height,goals=self.goals,agents=self.agents,
+                   obstacles=self.obstacles,board=self.board)
 
 
     def generate_random_world(self):
         print("fse")
 
     #creating the world manually
-    def createWorld(self,argWidth,argHeigth, argObstacleInfo, argAgentInfo, goalInfo,argAgent_Location_Constraint=True):
+    def createWorld(self,argWidth,argHeigth, argObstacleList, argAgentList, goalList,argAgent_Location_Constraint=True):
         #World Parameters
         self.width = argWidth
         self.height = argHeigth
         #creating empty world
         self.board=np.zeros((self.height,self.width),dtype=int)
         #getting the information about the goal, obstacles, and the payers
-        self.obstacles= argObstacleInfo
-        self.goals = goalInfo
-        self.agents= argAgentInfo
+        self.obstacles= argObstacleList
+        self.goals = goalList
+        self.agents= argAgentList
         #placing obsticles and the goal on the grid
         self.place_objects(self.goals)
         self.place_objects(self.obstacles)
@@ -110,7 +114,7 @@ class world():
                 if self.board[i,j]<0:
                     num_obstacles +=1
                 # if the value is more than 100 we count that as a goal
-                elif self.board[i,j]>100:
+                elif self.board[i,j]>99:
                     num_goals +=1
                 #if the value is between 1 and 99 we consider that an agent
                 elif self.board[i,j]>0 and self.board[i,j]<100:
@@ -118,11 +122,18 @@ class world():
 
         #printing the result of validity check
         print("The resault of Validity Check")
-        print("[# of agents, goals , Obstacles] is ",[num_agents,num_goals,num_obstacles])
-        print("The required [# of agents, goals , Obstacles] is ",[len(self.agents),len(self.goals),len(self.obstacles)])
+        print("[# tiles of agents, goals , Obstacles] is ",[num_agents,num_goals,num_obstacles])
+        print("[# of agents, goals , Obstacles] is ",[len(self.agents),len(self.goals),len(self.obstacles)])
 
+        obstacle_counter= 0
+        for i in self.obstacles:
+            obstacle_counter += i.width * i.height
+
+        goal_counter= 0
+        for i in self.goals:
+            goal_counter += i.width * i.height
         #if they matched given values
-        if(num_obstacles == len(self.obstacles)) and (num_goals == len(self.goals)) and (num_agents == len(self.agents)):
+        if(num_obstacles == obstacle_counter) and (num_goals == goal_counter) and (num_agents == len(self.agents)):
             print("The test was successfully, Right amount of objects are created")
             #Since the number of objects are correct, this function would validate the board
             return True
@@ -139,8 +150,7 @@ class world():
     def place_objects(self,object):
         #for each object
         for i in range(len(object)):
-            #calculate the margin that is half of the size of the goal
-            print(object[i].id)
+            #calculate the margin of the object
             margin_width = object[i].width
             margin_height = object[i].height
             #random position of object
@@ -222,7 +232,9 @@ class world():
             if self.visualize:
                 print("Goal " + str(argGoal.id) + "is removed")
             #Remove goal from the board
-            self.board[x,y]= 0
+            for i in range(x,argGoal.height+1):
+                for j in range(y,argGoal.width+1):
+                    self.board[i][j]=0
             return True,x,y
 
     # The function for removing the obstacle from the work
@@ -238,7 +250,9 @@ class world():
             if self.visualize:
                 print("Obstacle " + str(argObstacle.id) + "is removed")
             # Remove goal from the board
-            self.board[x, y] = 0
+            for i in range(x, argObstacle.height + 1):
+                for j in range(y, argObstacle.width + 1):
+                    self.board[i][j] = 0
             return True, x, y
 
     #The function for removing the agent from the work
@@ -256,6 +270,30 @@ class world():
             #Remove Agent from the board
             self.board[x,y]= 0
             return True,x,y
+
+    def print_the_world(self):
+        print("###################")
+        print("World Information")
+        print("width: "+str(self.width)+"   ,    height :"+str(self.height))
+        print("###################")
+        print("      agents    ")
+        print("###################")
+        for i in self.agents:
+            print("\nid:"+str(i.id)+"\nvis_x:"+str(i.vision_x)+"\nvis_y:"+str(i.vision_y)+"\nx:"+str(i.positionX)+
+                  "\ny:"+str(i.positionY)+"\nstep_cost:"+str(i.step_cost))
+        print("###################")
+        print("      goals    ")
+        print("###################")
+        for i in self.goals:
+            print("\nid:"+str(i.id)+"\ncolor:"+str(i.color)+"\nwidth:"+str(i.width)+"\nheight:"+str(i.height)+
+                  "\nx:"+str(i.x)+"\ny:"+str(i.y))
+        print("###################")
+        print("      obstacles    ")
+        print("###################")
+        for i in self.obstacles:
+            print("\nid:"+str(i.id)+"\ncolor:"+str(i.type)+"\nwidth:"+str(i.width)+"\nheight:"+str(i.height)+
+                  "\nx:"+str(i.x)+"\ny:"+str(i.y))
+
 
 if __name__=='__main__':
     print("__________EXAMPLE WORLD_________")

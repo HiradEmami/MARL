@@ -4,13 +4,15 @@ __author__ ='Hirad Emami Alagha'
 import numpy as np
 import os,time
 from world import *
+from worldObject import *
+from agent import *
 
 
 
 #global variables
 primaryDirectory='Saved_Worlds'
 
-def save_world(argWorldName,board, obstacles):
+def save_world(argWorldName,board, obstacles, agents, goals, width, height):
 #The primary Directory for worlds is a folder called Saved_worlds
 
         #The output folder to save all the information of the world is saved as:
@@ -33,6 +35,7 @@ def save_world(argWorldName,board, obstacles):
             print("The new world is saved in MARL/: " + outputDirect)
         #call function to save the world file
         save_grid(outputDirect=outputDirect,board=board)
+        save_info(outputDirect=outputDirect,obstacles=obstacles,agents=agents,goals=goals,height=height,width=width)
 
 
 #the save function that specifically saves the world, this function is also used for visualization
@@ -48,25 +51,113 @@ def save_grid(outputDirect,board):
     # closing the file
     file_1.close()
 
-def save_info(outputDirect,agents,obstacles,goals,world):
+def save_info(outputDirect,agents,obstacles,goals,height,width):
     # saving the main info file
     file = open(outputDirect + "/info.txt", 'w')
     # the primary loop for basic information
-    file.write(str(len(agents))+" "+str(len(obstacles))+" "+str(len(goals)))
-    file.write("\n")
-    file.write(str(world.height)+" "+str(world.height))
-    file.write("\n")
+    file.write(str(len(agents)) + " " + str(len(obstacles)) + " " + str(len(goals))+"\n")
+    file.write(str(height) + " " + str(width)+"\n")
 
     for i in range(len(agents)):
-        file.write(str(agents[i].id)+"\n")
+
+        file.write(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
+                   +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
+                   +str(agents[i].mode)+"\n")
+        print(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
+                   +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
+                   +str(agents[i].mode)+"\n")
 
     for i in range(len(obstacles)):
-        file.write(str(obstacles[i].id)+" "+str(obstacles[i].id)+" "+str(obstacles[i].id)+" "+str(obstacles[i].id)+"\n")
+        file.write(str(obstacles[i].id)+" "+str(obstacles[i].width)+" "+str(obstacles[i].height)+" "+str(obstacles[i].x)
+                   +" "+str(obstacles[i].y)+" "+str(obstacles[i].type)+"\n")
 
+    for i in range(len(goals)):
+        file.write(str(goals[i].id)+" "+str(goals[i].width)+" "+str(goals[i].height)+" "+str(goals[i].x)+" "+
+                   str(goals[i].y)+" "+str(goals[i].color)+"\n")
     
     # closing the file
     file.close()
 
+# PRIVATE function for importing the info file and converting them to appropriate lists
+def read_info(argFile):
+
+    # reading all the lines in the file
+    lines = argFile.readlines()
+
+    lengths=lines[0].split(" ")
+    len_agent = int(lengths[0])
+    len_obstacles=int(lengths[1])
+    len_goals=int(lengths[2])
+
+    worldinfo=lines[1].split(" ")
+    world_height=int(worldinfo[0])
+    world_width=int(worldinfo[1])
+
+    #print(len_agent,len_obstacles,len_goals,height,width)
+
+    print(len(lines))
+    agents=[]
+    goals=[]
+    obstacles=[]
+
+    line_counter=2
+    num_agent=1
+    num_goal=1
+    num_obstacle=1
+
+    while(num_agent<len_agent+1):
+        info = lines[line_counter].split(" ")
+        id = int(info[0])
+        vision_x = int(info[1])
+        vision_y = int(info[2])
+        positionX = int(info[3])
+        positionY = int(info[4])
+        step_cost = float(info[5])
+        mode = str(info[6])
+
+        new_agent = agent(argId=id, argVisionX=vision_x, argVisionY=vision_y, argPosX=positionX, argPosY=positionY,
+                          argStepCost=step_cost, argMode=mode)
+        print(id, vision_x, vision_y, positionX, positionY,
+              step_cost, mode)
+        agents.append(new_agent)
+        line_counter+=1
+        num_agent+=1
+
+    while(num_goal<len_goals+1):
+        info=lines[line_counter].split(" ")
+        id=int(info[0])
+        width=int(info[1])
+        height=int(info[2])
+        x=int(info[3])
+        y=int(info[4])
+        temp=str(info[5])
+        temp2=temp.split("\n")
+        type=temp2[0]
+        new_obstacle= obstacle(argType=type,argId=id,argWidth=width,argHight=height,argX=x,argY=y)
+        num_goal+=1
+        line_counter+=1
+
+        obstacles.append(new_obstacle)
+        print(type,id,width,height,x,y)
+
+    while(num_obstacle<len_obstacles+1):
+        info = lines[line_counter].split(" ")
+        id = int(info[0])
+        width = int(info[1])
+        height = int(info[2])
+        x = int(info[3])
+        y = int(info[4])
+        temp=str(info[5])
+        temp2=temp.split("\n")
+        color=temp2[0]
+        print(color, id, width, height, x, y)
+        new_goal = goal(argColor=color, argId=id, argWidth=width, argHight=height, argX=x, argY=y)
+
+        goals.append(new_goal)
+        num_obstacle+=1
+        line_counter+=1
+
+    return world_width,world_height,agents,obstacles,goals
 
 
 # PRIVATE function for importing the world file and converting it to matrix
@@ -109,8 +200,10 @@ def load_world(worldFOlder):
             input_files.append(inputFile)
 
     print("_________Files Imported_________")
-    grid=read_world(open(path+"/world.txt",'r'))
-    return grid
+    board=read_world(open(path+"/world.txt",'r'))
+    width, height, agents, obstacles, goals =read_info(open(path+"/info.txt",'r'))
+
+    return board , width, height, agents, obstacles, goals
 
 def calculateTheScale(height,width):
     #if the world is square

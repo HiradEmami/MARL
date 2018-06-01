@@ -14,7 +14,11 @@ import java.util.ArrayList;
  * @author Hirad Gorgoroth
  */
 public class mainFrame extends javax.swing.JFrame {
-
+    private ArrayList<JTextField> nods;
+    private int inputWidth;
+    private int inputHeight;
+    private int thickness;
+    private int [][] dimentions;
     
     public mainFrame() {
         initComponents();
@@ -25,20 +29,58 @@ public class mainFrame extends javax.swing.JFrame {
      private void set_panel(String argPanel){
          switch(argPanel){
              case "goal":
+                 world_panel.setVisible(false);
+                 Result_panel.setVisible(false);
+                 start_panel.setVisible(false);
+                 obstacle_panel.setVisible(false);
+                 agentPanel.setVisible(false);
+                 goal_Panel.setVisible(true);
                  break;
-             case "agent": 
+             case "agent":
+                 world_panel.setVisible(false);
+                 Result_panel.setVisible(false);
+                 start_panel.setVisible(false);
+                 obstacle_panel.setVisible(false);
+                 goal_Panel.setVisible(false);
+                 agentPanel.setVisible(true);
                  break;
-             case "world_panel":
+             case "world":
+                 Result_panel.setVisible(false);
+                 start_panel.setVisible(false);
+                 obstacle_panel.setVisible(false);
+                 agentPanel.setVisible(false);
+                 goal_Panel.setVisible(false);
+                 world_panel.setVisible(true);
                  break;
              case "obstacle":
+                 world_panel.setVisible(false);
+                 Result_panel.setVisible(false);
+                 start_panel.setVisible(false);
+                 agentPanel.setVisible(false);
+                 goal_Panel.setVisible(false);
+                 obstacle_panel.setVisible(true);
                  break;
-             case "main":
+             case "start":
+                 world_panel.setVisible(false);
+                 Result_panel.setVisible(false);
+                 obstacle_panel.setVisible(false);
+                 agentPanel.setVisible(false);
+                 goal_Panel.setVisible(false);
+                 start_panel.setVisible(true);
+                 break;
+             case "result":
+                 world_panel.setVisible(false);
+                 start_panel.setVisible(false);
+                 obstacle_panel.setVisible(false);
+                 agentPanel.setVisible(false);
+                 goal_Panel.setVisible(false);
+                 Result_panel.setVisible(true);                 
                  break;
          }
          
      }
      private void generateNods(int height, int weidth){
-        resultPanel.setLayout(new GridBagLayout());
+        world_panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         
         
@@ -52,7 +94,7 @@ public class mainFrame extends javax.swing.JFrame {
               jtextField.setText("-1");
               nods.add(jtextField);
               jtextField.setHorizontalAlignment(JTextField.CENTER);
-              resultPanel.add(nods.get(nods.size()-1),c);
+              world_panel.add(nods.get(nods.size()-1),c);
             }
         }
 //          JButton button = new JButton("See the Code");
@@ -67,7 +109,7 @@ public class mainFrame extends javax.swing.JFrame {
 //         c.gridy=height+6;
 //         resultPanel.add(button, c);
         
-        this.pack();
+
         
 
     }
@@ -77,13 +119,14 @@ public class mainFrame extends javax.swing.JFrame {
 
         jPanel4 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
+        Result_panel = new javax.swing.JPanel();
+        start_panel = new javax.swing.JPanel();
         agentPanel = new javax.swing.JPanel();
         obstacle_panel = new javax.swing.JPanel();
         goal_Panel = new javax.swing.JPanel();
         world_panel = new javax.swing.JPanel();
         main_panel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -102,31 +145,31 @@ public class mainFrame extends javax.swing.JFrame {
 
         jPanel4.add(jPanel11, "card8");
 
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout Result_panelLayout = new javax.swing.GroupLayout(Result_panel);
+        Result_panel.setLayout(Result_panelLayout);
+        Result_panelLayout.setHorizontalGroup(
+            Result_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 870, Short.MAX_VALUE)
         );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        Result_panelLayout.setVerticalGroup(
+            Result_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 422, Short.MAX_VALUE)
         );
 
-        jPanel4.add(jPanel10, "card7");
+        jPanel4.add(Result_panel, "card7");
 
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout start_panelLayout = new javax.swing.GroupLayout(start_panel);
+        start_panel.setLayout(start_panelLayout);
+        start_panelLayout.setHorizontalGroup(
+            start_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 870, Short.MAX_VALUE)
         );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        start_panelLayout.setVerticalGroup(
+            start_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 422, Short.MAX_VALUE)
         );
 
-        jPanel4.add(jPanel9, "card6");
+        jPanel4.add(start_panel, "card6");
 
         agentPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.gray, java.awt.Color.lightGray, java.awt.Color.darkGray, java.awt.Color.gray));
 
@@ -196,21 +239,40 @@ public class mainFrame extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 142, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(main_panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 6, Short.MAX_VALUE))
+                .addGap(6, 6, 6))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(main_panel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 171, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -253,14 +315,15 @@ public class mainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel Result_panel;
     private javax.swing.JPanel agentPanel;
     private javax.swing.JPanel goal_Panel;
-    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel main_panel;
     private javax.swing.JPanel obstacle_panel;
+    private javax.swing.JPanel start_panel;
     private javax.swing.JPanel world_panel;
     // End of variables declaration//GEN-END:variables
 }
