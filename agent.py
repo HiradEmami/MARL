@@ -75,7 +75,7 @@ class agent():
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
         # the size of input and output layers
-        self.input_size=self.vision_x * self.vision_y
+        self.input_size=(self.vision_x * self.vision_y*3)+2
         self.output_size=argOutputSize
         # defining the network
         self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate, self.hidden_activation, self.out_activation)
