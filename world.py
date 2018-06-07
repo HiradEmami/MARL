@@ -1,7 +1,12 @@
-#The world class creates the 2-dimensional Grid
+# The world class creates the 2-dimensional Grid
+# It holds lists of all the Obstacles, Agents, Goals
+# It has the primary board of the game and has all the objects coded in the matrix
+# It has functions for saving itself or load a pre-built world
+# You can randomize a world, or load a world or use the create mode that builds the world based on given info
+# It also holds functions for moving the agent in the board
 __author__='Hirad Emami Alagha - S3218139'
 
-#required Libraries
+# Required Libraries
 import numpy as np
 import tkinter as tk
 import random as rd
@@ -11,10 +16,10 @@ import os
 from system_utility import *
 from tkinter import *
 from worldObject import *
-from copy import copy
+import copy
 
 
-#TODO: must create a refresh method
+# TODO: must create a refresh method
 class world():
 
     #there are three modes for the world:
@@ -28,7 +33,7 @@ class world():
     def loadWolrd(self,argName):
         self.board, self.width, self.height, self.agents, self.obstacles, self.goals = load_world(argName)
         print(self.height)
-        self.default_board = copy(self.board)
+        self.default_board = copy.copy(self.board)
 
 
     def saveWorld(self,argWorldName):
@@ -55,7 +60,7 @@ class world():
         self.place_objects(self.obstacles)
         self.place_agents(argMargine_constraint=argAgent_Location_Constraint)
         #taking a copy of the world
-        self.default_board = copy(self.board)
+        self.default_board = copy.copy(self.board)
 
 
     def place_agents(self,argMargine_constraint=True):
@@ -79,7 +84,7 @@ class world():
     def move_up(self,argPlayer):
         print("up")
         i,j=self.search_for_object(argPlayer)
-        self.board[i,j]=0
+        self.board[i][j]=0
         self.board[i-1,j]=argPlayer.id
     def move_down(self,argPlayer):
         print("down")

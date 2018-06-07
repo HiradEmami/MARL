@@ -8,55 +8,56 @@ import random
 
 
 
-#TODO: I should add the halt move properly to the network and every other function
-#TODO: I should make the functions for performing the moves properly
+# TODO: I should add the halt move properly to the network and every other function
+# TODO: I should make the functions for performing the moves properly
 
 class agent():
-    #An agent is initialized using:
+    # An agent is initialized using:
     #   1)   An integer "id"
     #   2)   The Extent of it's vision = (argVisionY, argVisionX)  #The default value is set at 5
     #   3)   Mode = that can be training, testing
     def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=0.1,argPosX=0,argPosY=0):
-        #the position of the agent on grid
+        # the position of the agent on grid
         self.positionX=argPosX
         self.positionY=argPosY
-        #placeholder for the initial position
+        # placeholder for the initial position
         self.default_positionX=0
         self.default_positionY=0
-        #the id of the agent
+        # the id of the agent
         self.id = argId
-        #setting the cost of
-        #the vision of the agent, portion of the word it observs
+        # setting the cost of
+        # the vision of the agent, portion of the word it observs
         self.vision_x = argVisionX
         self.vision_y = argVisionY
-        #Calculating the margine of his vision using "set_margines" function
+        # Calculating the margine of his vision using "set_margines" function
         self.set_margines()
-        #The area of the board that agent sees is set at 0
+        # The area of the board that agent sees is set at 0
         self.vision = []
-        #the State of the player can be:
+        # the State of the player can be:
         #   1) "initialized"
         #   3) "progressing : selecting next action
         #   4) "waiting for the action"
         #   2) "arrived"
         self.state="initialized"
-        #mode defines if the agent is "training" or "testing" or "developer"
+        # mode defines if the agent is "training" or "testing" or "developer"
         self.mode = argMode
-        #counter of number of moves
+        # counter of number of moves
         self.move_count = 0
-        #cost of every action
+        # cost of every action
         self.step_cost = argStepCost
+        self.pad_value=-5
 
-    #the function to reset the agent back to the initial state to start the simulation again
+    # the function to reset the agent back to the initial state to start the simulation again
     def reset_agent(self):
-        #reseting the number of moves
+        # reseting the number of moves
         self.move_count = 0
-        #setting back the state of the agent
+        # setting back the state of the agent
         self.state = "initialized"
-        #setting the location of the agents back to default values
+        # setting the location of the agents back to default values
         self.positionX = self.default_positionX
         self.positionY = self.default_positionY
 
-    #setter for the default values
+    # setter for the default values
     def set_default_positions(self):
         self.default_positionY = self.positionY
         self.default_positionX = self.positionX
@@ -65,65 +66,135 @@ class agent():
         self.positionX= posX
         self.positionY=posY
 
-    #The Create_brain function creates the primary neural netwokr that the agent is using the given
-    #parameters. The function is called after creation of the agent
+    # The Create_brain function creates the primary neural netwokr that the agent is using the given
+    # parameters. The function is called after creation of the agent
     def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation,argOutputSize=5):
-        #the primary neural network
+        # the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
-        #the size of input and output layers
+        # the size of input and output layers
         self.input_size=self.vision_x * self.vision_y
         self.output_size=argOutputSize
-        #defining the network
+        # defining the network
         self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate, self.hidden_activation, self.out_activation)
-        #setting the exploration and discount of the network
+        # setting the exploration and discount of the network
         self.exploration = argExploration
         self.discount = argDiscount
-        #for back prop we need to store :
+        # for back prop we need to store :
         #   1) the index of the output layer that corresponds to the move we chose
         self.previous_index = None
 
-    #Set_margines function updates the extent that agent sees from the board
+    # Set_margines function updates the extent that agent sees from the board
     # for example if the vision is 3x3 it means the agent is at a center of a square
-    #and the agent sees one tile in every dimension
+    # and the agent sees one tile in every dimension
     def set_margines(self):
         self.marginx = (int)((self.vision_x - 1) / 2)
         self.marginY = (int)((self.vision_y - 1) / 2)
 
-    #update_the vision of player
+    # update_the vision of player
     def get_observable_board(self,argBoard):
-        #if we are using developer mode we only return the entire board
+        # if we are using developer mode we only return the entire board
         if self.mode =="developer":
             return argBoard
         else:
-            #calculating the boundaries
+            # calculating the boundaries
             y0 = max(0, self.positionY - self.marginY)
             y1 = min(len(argBoard), self.positionY + self.marginY + 1)
             x0 = max(0, self.positionX - self.marginx)
             x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
-            #calculating the boundaries
-            return argBoard[y0:y1, x0:x1]
+            # calculating the boundaries
+            observed= argBoard[y0:y1, x0:x1]
+            observed= self.pad_grid(argboard=observed,width_board=len(argBoard[0]),height_board=len(argBoard))
+            return observed
 
+    def pad_grid(self, argboard, width_board, height_board):
+        left_right = "center"
+        top_bottom = "center"
+        if self.positionX == 0:
+            left_right = "left"
+            argboard = self.pad_left(argboard)
+        elif self.positionX == width_board - 1:
+            left_right = "right"
+            argboard = self.pad_right(argboard)
+        print(left_right)
 
-    #the function for selecting the next action
+        if self.positionY == 0:
+            top_bottom = "top"
+            argboard = self.pad_top(argboard)
+
+        elif self.positionY == height_board - 1:
+            top_bottom = "bottom"
+            argboard = self.pad_bottom(argboard)
+        print(top_bottom)
+
+        return argboard
+
+    def pad_left(self, argboard):
+        new_board = []
+        for i in range(len(argboard)):
+            new_col = []
+            new_col.append(self.pad_value)
+            for j in range(len(argboard[0])):
+                new_col.append(argboard[i][j])
+            new_board.append(new_col)
+        return new_board
+
+    def pad_top(self, argboard):
+        new_board = []
+        top_row = []
+        for i in range(self.vision_x):
+            top_row.append(self.pad_value)
+        new_board.append(top_row)
+        for i in range(len(argboard)):
+            new_row = []
+            for j in range(len(argboard[0])):
+                new_row.append(argboard[i][j])
+            new_board.append(new_row)
+        return new_board
+
+    def pad_bottom(self, argboard):
+        new_board = []
+        bottom_row = []
+        for i in range(self.vision_x):
+            bottom_row.append(self.pad_value)
+
+        for i in range(len(argboard)):
+            new_row = []
+            for j in range(len(argboard[0])):
+                new_row.append(argboard[i][j])
+            new_board.append(new_row)
+        new_board.append(bottom_row)
+        return new_board
+
+    def pad_right(self, argboard):
+        new_board = []
+        for i in range(len(argboard)):
+            new_col = []
+            for j in range(len(argboard[0])):
+                new_col.append(argboard[i][j])
+            new_col.append(self.pad_value)
+            new_board.append(new_col)
+        return new_board
+
+    # the function for selecting the next action
     def make_decision(self,argWGrid):
-        #The portion of the grid that is observed by the agent currently, will be passed as argWGrid
-        #This matrix is flattened to be used as the input layer of the Q-learning network
+        # The portion of the grid that is observed by the agent currently, will be passed as argWGrid
+        # This matrix is flattened to be used as the input layer of the Q-learning network
         observabl_grid = self.get_observable_board(argBoard=argWGrid)
         obstacle_board = self.get_obstacle_grid(argGrid=observabl_grid)
         agent_board= self.get_agent_grid(argGrid=observabl_grid)
         goal_board= self.get_goal_grid(argGrid=observabl_grid)
         self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
-        #the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
+        # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1
-        #if the mode is set at training/developer we use the following steps
-        #note that this would only work if the state is not initialized
-        #THis means no attempt at back prop if it is the first step
+        # if the mode is set at training/developer we use the following steps
+        # note that this would only work if the state is not initialized
+        # THis means no attempt at back prop if it is the first step
         if not(self.mode == "testing") and not (self.state == "initialized"):
-            #we first obtain our previous input layer by copying the input of NN
+            # we first obtain our previous input layer by copying the input of NN
             previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
             previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
 
@@ -138,27 +209,27 @@ class agent():
         else:
             self.state = "Progressing"
 
-        #training : this statement selects the move
+        # training : this statement selects the move
         if not (self.mode == "testing"):
-            #first we try a chance on a random move for exploration
+            # first we try a chance on a random move for exploration
             if random.uniform(0,1) < self.exploration:
                 index, move = self.get_random_move()
                 output_layer = self.NN.forward_propagation(self.input_layer)
                 self.confidence = output_layer[index]
                 # Use network forward pass
             else:
-                index, confidence, move = self.get_best_move()
+                index, self.confidence, move = self.get_best_move()
 
-        #testing
+        # testing
         else:
-            #just simply forward pass to obtain the move
-            index, confidence, move = self.get_best_move()
+            #j ust simply forward pass to obtain the move
+            index, self.confidence, move = self.get_best_move()
 
-        #uodating counter values and previous index variable
+        # uodating counter values and previous index variable
         self.previous_index = index
         self.move_count += 1
 
-        return move, confidence
+        return move, self.confidence
 
     # Update the weights
     def final_update(self, opponent_score, own_score):
@@ -178,28 +249,28 @@ class agent():
     def get_best_move(self):
         # first we obtain the network's output using forward propogation given the input layer
         network_rewards = copy.copy(self.NN.forward_propagation(self.input_layer))
-        # obtain the output nodes (rewards) corresponding with legal moves
-        #this returns two list :
+        # Obtain the output nodes (rewards) corresponding with legal moves
+        # this returns two list :
         #  1) the options =(moves, score) eg, [('up',5),('left',4)]
         #  2) the scores =[network output value] eg, [5,4]
         options,scores = self.get_move_options(argOutputlayer=network_rewards)
-        #we call the function that finds the index, move and value given the options for the best move
+        # we call the function that finds the index, move and value given the options for the best move
         index, move, value =  self.get_max_value_move(argOptions=options,argScores=scores)
-        #returning the result for selecting the best move
+        # returning the result for selecting the best move
         return index, value, move
 
-    #function that returns a list of confidence
+    # Function that returns a list of confidence
     def get_move_options(self,argOutputlayer):
-        #we first take a copy of the output layer
+        # We first take a copy of the output layer
         output=copy.copy(argOutputlayer)
-        #checking if the output layer's size matches what we specified
+        # Checking if the output layer's size matches what we specified
         if not (len(output) ==self.output_size):
             print("ERROR!!! OUTPUT LAYER DOES NOT HAVE ACCEPTABLE SIZE")
             print(len(output), self.output_size)
-        #placeholder variable that stores the score of the corresponding accepted move in a list
+        # Placeholder variable that stores the score of the corresponding accepted move in a list
         scores=[]
         options=[]
-        #we loop through all the possible moves
+        # we loop through all the possible moves
         for i in self.possible_moves:
             move_index = self.move_to_index(argMove=i[2])
             temp = (i[2], output[move_index])
@@ -207,23 +278,22 @@ class agent():
             scores.append(output[move_index])
         return options,scores
 
-    #function for selecting move with max value , it returns the index of the move with the highest value
+    # function for selecting move with max value , it returns the index of the move with the highest value
     def get_max_value_move(self,argOptions, argScores):
-        if (len(self.possible_moves) == 0):
+        if len(self.possible_moves) == 0:
             print("NO Possible Move is Available")
         max = np.max(argScores)
         for index in range(len(argOptions)):
             if argOptions[index][1] == max:
-                #it returns the index of the item, the move and the value of the move
+                # it returns the index of the item, the move and the value of the move
                 return index, argOptions[index][0], argOptions[index][1]
-
 
     def get_random_move(self):
         randomChoice = random.choice(self.possible_moves)
         index = self.move_to_index(randomChoice[2])
         return index, randomChoice[2]
 
-    #function that takes a move and returns it's corresponding index in output layer
+    # function that takes a move and returns it's corresponding index in output layer
     def move_to_index(self,argMove):
         if argMove=="up":
             return 0
@@ -236,7 +306,7 @@ class agent():
         elif argMove == "halt":
             return 4
 
-    #function that takes an index of output layer and returns the corresponding move
+    # function that takes an index of output layer and returns the corresponding move
     def index_to_move(self,argIndex):
         if argIndex == 0:
             return "up"
