@@ -8,13 +8,21 @@ class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False):
         self.world = argWorld
         #taking a copy of the starting board
-        self.starting_board = copy(self.world.board)
+        self.starting_board = self.copy_board(self.world.board)
         self.developerMode=argDeveloperMode
         self.stepLimit=argSteplimit
 
     #function to reset the grid and reset player information
     def reset_settings(self):
-        self.world.board = copy(self.starting_board)
+        print("reseting")
+        print("starting board")
+        print(self.starting_board)
+        print("world board")
+        print(self.world.board)
+
+        self.world.board = self.copy_board(self.starting_board)
+        print("after reset")
+        print(self.world.board)
         for i in range(len(self.world.agents)):
             self.world.agents[i].reset_agent()
 
@@ -96,3 +104,12 @@ class simulation():
         if self.developerMode:
             print("Number of remaining agents:"+str(count))
         return count
+
+    def copy_board(self,argboard):
+        new_list=[]
+        for i in range(len(argboard)):
+            new_row=[]
+            for j in range(len(argboard[0])):
+                new_row.append(argboard[i][j])
+            new_list.append(new_row)
+        return new_list
