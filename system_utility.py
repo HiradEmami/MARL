@@ -59,7 +59,7 @@ def save_info(outputDirect,agents,obstacles,goals,height,width):
     file.write(str(height) + " " + str(width)+"\n")
 
     for i in range(len(agents)):
-
+        print(len(agents),"TEST")
         file.write(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
                    +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
                    +str(agents[i].mode)+"\n")
@@ -113,7 +113,11 @@ def read_info(argFile):
         positionX = int(info[3])
         positionY = int(info[4])
         step_cost = float(info[5])
-        mode = str(info[6])
+        temp= str(info[6])
+        temp2 = temp.split("\n")
+        mode = temp2[0]
+
+
 
         new_agent = agent(argId=id, argVisionX=vision_x, argVisionY=vision_y, argPosX=positionX, argPosY=positionY,
                           argStepCost=step_cost, argMode=mode)

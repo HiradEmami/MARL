@@ -14,7 +14,7 @@ from simulation import  *
 #TODO: The save and load functions need some serious update
 #TODO: Reward Shaping
 #TODO: Rewards
-DEVELOPER_MODE = True
+DEVELOPER_MODE = False
 
 new_world = world(argCreationMode="load")
 new_world.loadWolrd(argName="test")
