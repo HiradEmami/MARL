@@ -105,9 +105,19 @@ class agent():
             x0 = max(0, self.positionX - self.marginx)
             x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
             # calculating the boundaries
-            observed= argBoard[y0:y1, x0:x1]
+            print(argBoard)
+            observed= self.slice_list(arglist=argBoard,x0=x0,x1=x1,y0=y0,y1=y1)
             observed= self.pad_grid(argboard=observed,width_board=len(argBoard[0]),height_board=len(argBoard))
             return observed
+
+    def slice_list(self,arglist,x0,x1,y0,y1):
+        sliced_list=[]
+        for i in range(y0,y1):
+            new_row=[]
+            for j in range(x0,x1):
+                new_row.append(arglist[i][j])
+            sliced_list.append(new_row)
+        return sliced_list
 
     def pad_grid(self, argboard, width_board, height_board):
         left_right = "center"
@@ -118,8 +128,6 @@ class agent():
         elif self.positionX == width_board - 1:
             left_right = "right"
             argboard = self.pad_right(argboard)
-        print(left_right)
-
         if self.positionY == 0:
             top_bottom = "top"
             argboard = self.pad_top(argboard)
@@ -127,8 +135,6 @@ class agent():
         elif self.positionY == height_board - 1:
             top_bottom = "bottom"
             argboard = self.pad_bottom(argboard)
-        print(top_bottom)
-
         return argboard
 
     def pad_left(self, argboard):
@@ -188,6 +194,9 @@ class agent():
         goal_board= self.get_goal_grid(argGrid=observabl_grid)
         self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
+        print(self.positionX,self.positionY)
+        print(observabl_grid)
+        print(self.possible_moves)
         # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1
         # if the mode is set at training/developer we use the following steps
@@ -323,13 +332,13 @@ class agent():
 
     def try_move_up(self, argboard):
         if (self.positionY - 1) > -1:
-            if argboard[self.positionY - 1, self.positionX] == 0:
+            if argboard[self.positionY - 1][ self.positionX] == 0:
                 # self.move_up(argAgent)
                 # self.agents[index].positionY -=1
                 return True, "empty", "up"
-            elif argboard[self.positionY - 1, self.positionX] > 99:
+            elif argboard[self.positionY - 1][ self.positionX] > 99:
                 return True, "goal", "up"
-            elif argboard[self.positionY - 1, self.positionX] < 0:
+            elif argboard[self.positionY - 1][ self.positionX] < 0:
                 return False, "obstacle", "up"
             else:
                 return False, "occupied", "up"
@@ -339,13 +348,13 @@ class agent():
     def try_move_down(self, argboard):
         height=len(argboard)
         if (self.positionY + 1) < height:
-            if argboard[self.positionY + 1, self.positionX] == 0:
+            if argboard[self.positionY + 1][ self.positionX] == 0:
                 # self.move_left(argAgent)
                 # self.agents[index].positionY += 1
                 return True, "empty", "down"
-            elif argboard[self.positionY + 1, self.positionX] > 99:
+            elif argboard[self.positionY + 1][self.positionX] > 99:
                 return True, "goal", "down"
-            elif argboard[self.positionY + 1, self.positionX] < 0:
+            elif argboard[self.positionY + 1][self.positionX] < 0:
                 return False, "obstacle", "down"
             else:
                 return False, "occupied", "down"
@@ -354,13 +363,13 @@ class agent():
 
     def try_move_left(self, argboard):
         if (self.positionX - 1) > -1:
-            if argboard[self.positionY, self.positionX - 1] == 0:
+            if argboard[self.positionY][ self.positionX - 1] == 0:
                 # self.move_left(argAgent)
                 # self.agents[index].positionX -=1
                 return True, "empty", "left"
-            elif argboard[self.positionY, self.positionX - 1] > 99:
+            elif argboard[self.positionY][ self.positionX - 1] > 99:
                 return True, "goal", "left"
-            elif argboard[self.positionY, self.positionX - 1] <0:
+            elif argboard[self.positionY][ self.positionX - 1] <0:
                 return False, "obstacle", "left"
             else:
                 return False, "occupied", "left"
@@ -370,13 +379,13 @@ class agent():
     def try_move_right(self, argboard):
         width=len(argboard[0])
         if (self.positionX + 1) < width:
-            if argboard[self.positionY, self.positionX + 1] == 0:
+            if argboard[self.positionY][ self.positionX + 1] == 0:
                 # self.move_right(argAgent)
                 # self.agents[index].positionX +=1
                 return True, "empty", "right"
-            elif argboard[self.positionY, self.positionX + 1] > 99:
+            elif argboard[self.positionY][ self.positionX + 1] > 99:
                 return True, "goal", "right"
-            elif argboard[self.positionY, self.positionX + 1] < 0:
+            elif argboard[self.positionY][self.positionX + 1] < 0:
                 return False, "obstacle", "right"
             else:
                 return False, "occupied", "right"
@@ -412,37 +421,38 @@ class agent():
 
 
     def get_obstacle_grid(self,argGrid):
+        new_list=[]
         for i in range(len(argGrid)):
             for j in range(len(argGrid[0])):
                 if argGrid[i][j]<0:
-                    argGrid[i][j]=1
-                else:argGrid[i][j]=0
-        result = self.flatten_list(argGrid)
-        return result
+                    new_list.append(1)
+                else:
+                    new_list.append(0)
+        return new_list
 
 
     def get_goal_grid(self,argGrid):
+        new_list = []
         for i in range(len(argGrid)):
             for j in range(len(argGrid[0])):
                 if argGrid[i][j]>99:
-                    argGrid[i][j]=1
+                    new_list.append(1)
                 else:
-                    argGrid[i][j]=0
-        result = self.flatten_list(argGrid)
-        return result
+                    new_list.append(0)
+        return new_list
 
     def get_agent_grid(self,argGrid):
+        new_list = []
         for i in range(len(argGrid)):
             for j in range(len(argGrid[0])):
                 if argGrid[i][j]>0 and argGrid[i][j]<100:
                     if argGrid[i][j]==self.id:
-                        argGrid[i][j] = 0
+                        new_list.append(0)
                     else:
-                        argGrid[i][j] = 1
+                        new_list.append(1)
                 else:
-                    argGrid[i][j]=0
-        result=self.flatten_list(argGrid)
-        return result
+                    new_list.append(0)
+        return new_list
 
     def shape_input_layer(self,argObstacleList, argGoalList, argAgnetList):
         if not (len(argAgnetList) == len(argGoalList)) or not (len(argGoalList) == len(argObstacleList)):
@@ -465,15 +475,6 @@ class agent():
             else:
                 return result_list
 
-    # function to that takes a 2d list and returns a flat array
-    def flatten_list(self,argList):
-        # flat arraty
-        flat_array = []
-        for i in range(len(argList)):
-            for j in range(len(argList[0])):
-                flat_array.append(argList[i][j])
-        # returning the 1d Flattened array
-        return flat_array
 
     # function that takes the flattened array and returns the 2d array
     def convert_2d(self,argFlatList, argWidth, argHeight):

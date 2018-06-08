@@ -5,7 +5,7 @@ import numpy as np
 import os,time
 from world import *
 from worldObject import *
-from agent import *
+from learner import *
 
 
 
@@ -125,6 +125,7 @@ def read_info(argFile):
 
     while(num_goal<len_goals+1):
         info=lines[line_counter].split(" ")
+        print(info)
         id=int(info[0])
         width=int(info[1])
         height=int(info[2])
@@ -139,6 +140,7 @@ def read_info(argFile):
 
         obstacles.append(new_obstacle)
         print(type,id,width,height,x,y)
+
 
     while(num_obstacle<len_obstacles+1):
         info = lines[line_counter].split(" ")

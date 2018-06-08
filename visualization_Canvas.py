@@ -5,7 +5,7 @@ import matplotlib.ticker as plticker
 import matplotlib.animation as animation
 import random as rd
 import world as wd
-import agent
+import learner
 from worldObject import *
 from matplotlib import pyplot as plt
 from matplotlib import colors

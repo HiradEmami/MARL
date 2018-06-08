@@ -1,6 +1,6 @@
 import world as wd
 from worldObject import *
-import agent,os
+import learner,os
 from tkinter import *
 import time,random
 
@@ -25,7 +25,7 @@ if initial:
     agents = []
     num_agents =8
     for i in range(num_agents):
-        a=agent.agent(argId=i+1)
+        a=learner.agent(argId=i+1)
         agents.append(a)
 
     world = wd.world("Create")
