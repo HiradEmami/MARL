@@ -1,5 +1,5 @@
 import worldObject
-from agent import *
+from learner import *
 from world import *
 from system_utility import *
 from simulation import  *
@@ -10,7 +10,8 @@ class worldGenrator():
         self.obstacles = []
         self.agents = []
         self.goals = []
-        self.width, self.height = 10,15
+        self.width=10
+        self.height = 15
 
         self.world = self.generate()
 
@@ -28,7 +29,7 @@ class worldGenrator():
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
-        num_agents=8
+        num_agents=1
         for i in range(1,num_agents+1):
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
             self.agents.append(new_agent)

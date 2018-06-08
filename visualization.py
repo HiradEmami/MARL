@@ -5,7 +5,7 @@ import matplotlib.ticker as plticker
 import matplotlib.animation as animation
 import random as rd
 import world as wd
-import agent,sys
+import learner,sys
 from worldObject import *
 from matplotlib import pyplot as plt
 from matplotlib import colors
@@ -13,7 +13,16 @@ from system_utility import *
 
 
 file_name = "test"
-grid = load_world(worldFOlder=file_name)
+primaryDirectory='Saved_Worlds'
+
+if not (file_name.startswith("world_")):
+    file_name = "world_" + file_name
+
+
+path=primaryDirectory + "/" + file_name
+
+
+grid = read_world(open(path+"/world.txt",'r'))
 width = len(grid[0])
 height = len(grid)
 color_map = colors.ListedColormap(['black', 'white', 'red', 'green'])
@@ -34,10 +43,9 @@ ax.set_yticks(np.arange(0,height, 1))
 
 
 def animate(i):
-    grid = load_world(worldFOlder=file_name)
+    grid = read_world(open(path+"/world.txt",'r'))
     ax.imshow(grid, interpolation='nearest', cmap=color_map,
                    norm=norm, extent=[0, width,height, 0])
 
 ani = animation.FuncAnimation(figure, animate, interval=500)
 plt.show()
-

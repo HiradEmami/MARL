@@ -11,7 +11,7 @@ import numpy as np
 import tkinter as tk
 import random as rd
 import math
-import agent
+from learner import *
 import os
 from system_utility import *
 from tkinter import *
@@ -85,22 +85,27 @@ class world():
         print("up")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.board[i-1,j]=argPlayer.id
+        self.board[i-1][j]=argPlayer.id
+        argPlayer.positionY =  argPlayer.positionY - 1
     def move_down(self,argPlayer):
         print("down")
         i,j=self.search_for_object(argPlayer)
-        self.board[i,j]=0
-        self.board[i+1,j]=argPlayer.id
+        self.board[i][j]=0
+        self.board[i+1][j]=argPlayer.id
+        argPlayer.positionY = argPlayer.positionY + 1
     def move_right(self,argPlayer):
         print("right")
         i,j=self.search_for_object(argPlayer)
-        self.board[i,j]=0
-        self.board[i,j+1]=argPlayer.id
+        self.board[i][j]=0
+        self.board[i][j+1]=argPlayer.id
+        argPlayer.positionX = argPlayer.positionX + 1
     def move_left(self,argPlayer):
         print("left")
         i,j=self.search_for_object(argPlayer)
-        self.board[i,j]=0
-        self.board[i,j-1]=argPlayer.id
+        self.board[i][j]=0
+        self.board[i][j-1]=argPlayer.id
+        argPlayer.positionX = argPlayer.positionX - 1
+
 
     #a search function that returns the index of an object in a list
     def find_object_index(self,object,list):
@@ -219,7 +224,7 @@ class world():
     def search_for_object(self,argObject):
         for i in range(self.height):
             for j in range(self.width):
-                if self.board[i,j] == argObject.id:
+                if self.board[i][j] == argObject.id:
                     return i,j
         print("Failed to find the object!")
         return None,None

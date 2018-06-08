@@ -5,7 +5,7 @@ import numpy as np
 import os,time
 from world import *
 from worldObject import *
-from agent import *
+from learner import *
 
 
 
@@ -122,9 +122,10 @@ def read_info(argFile):
         agents.append(new_agent)
         line_counter+=1
         num_agent+=1
-
+    line_counter += 1
     while(num_goal<len_goals+1):
         info=lines[line_counter].split(" ")
+        print(info)
         id=int(info[0])
         width=int(info[1])
         height=int(info[2])
