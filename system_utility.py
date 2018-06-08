@@ -122,7 +122,7 @@ def read_info(argFile):
         agents.append(new_agent)
         line_counter+=1
         num_agent+=1
-    line_counter += 1
+
     while(num_goal<len_goals+1):
         info=lines[line_counter].split(" ")
         print(info)
@@ -140,6 +140,7 @@ def read_info(argFile):
 
         obstacles.append(new_obstacle)
         print(type,id,width,height,x,y)
+
 
     while(num_obstacle<len_obstacles+1):
         info = lines[line_counter].split(" ")
