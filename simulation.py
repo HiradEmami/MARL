@@ -6,7 +6,6 @@ from pip._vendor.distlib.compat import raw_input
 
 class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False):
-
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = copy(self.world.board)
@@ -20,23 +19,39 @@ class simulation():
             self.world.agents[i].reset_agent()
 
     def run_one_simulation(self):
+
+        print("#######################")
+        print("Starting The simulation")
+        print("#######################")
+
         num_steps=0
         simulation_state = "running_simulation"
         while not(simulation_state== "finished"):
 
+            remain=self.number_remaining_agents()
+
             if num_steps>=self.stepLimit:
+                print("1 Number of remaining Agents: "+str(remain))
+                print("The Number of steps rich its limits\n# Performed Moves: "+str(num_steps)+
+                      "\n# step limits: "+str(self.stepLimit))
                 simulation_state="finished"
 
-            remain=self.number_remaining_agents()
-            if remain == 0:
+            elif remain == 0:
+                print("2 Number of remaining Agents: "+str(remain))
+                simulation_state = "finished"
                 simulation_state = "finished"
 
-            self.do_one_step()
-            num_steps += 1
-            if self.developerMode:
-                print(num_steps,self.stepLimit,simulation_state)
-                continue_key = float(raw_input("Enter 1 to continue:"))
+            else:
+                self.do_one_step()
+                num_steps += 1
+                if self.developerMode:
+                    print(num_steps, self.stepLimit, simulation_state)
+                    continue_key = float(raw_input("Enter 1 to continue:"))
 
+        print("#######################")
+        print("Simulation Completed!")
+        print("#######################")
+        print("Resetting simulation!")
         self.reset_settings()
         return num_steps , self.world
 

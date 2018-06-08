@@ -23,6 +23,7 @@ class agent():
         # placeholder for the initial position
         self.default_positionX=0
         self.default_positionY=0
+        self.set_default_positions()
         # the id of the agent
         self.id = argId
         # setting the cost of
@@ -57,10 +58,12 @@ class agent():
         self.positionX = self.default_positionX
         self.positionY = self.default_positionY
 
+
     # setter for the default values
     def set_default_positions(self):
         self.default_positionY = self.positionY
         self.default_positionX = self.positionX
+
 
     def set_position(self,posY,posX):
         self.positionX= posX
@@ -105,7 +108,6 @@ class agent():
             x0 = max(0, self.positionX - self.marginx)
             x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
             # calculating the boundaries
-            print(argBoard)
             observed= self.slice_list(arglist=argBoard,x0=x0,x1=x1,y0=y0,y1=y1)
             observed= self.pad_grid(argboard=observed,width_board=len(argBoard[0]),height_board=len(argBoard))
             return observed
@@ -194,8 +196,11 @@ class agent():
         goal_board= self.get_goal_grid(argGrid=observabl_grid)
         self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
-        print(self.positionX,self.positionY)
+        # print statement
+        print("Agent "+str(self.id)+" At position ("+str(self.positionX)+","+str(self.positionY)+")")
+        print("Observed grid: ")
         print(observabl_grid)
+        print("List of Possible Moves")
         print(self.possible_moves)
         # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1

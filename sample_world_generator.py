@@ -29,7 +29,7 @@ class worldGenrator():
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
-        num_agents=1
+        num_agents=3
         for i in range(1,num_agents+1):
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
             self.agents.append(new_agent)

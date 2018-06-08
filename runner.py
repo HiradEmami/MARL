@@ -30,9 +30,9 @@ for i in new_world.agents:
 
 
 
-num_simulations =1
+num_simulations =2
 for i in range(num_simulations):
-    simulation_e = simulation(argWorld=new_world, argSteplimit=15, argDeveloperMode=True)
+    simulation_e = simulation(argWorld=new_world, argSteplimit=15, argDeveloperMode=DEVELOPER_MODE)
     num_move, new_world = simulation_e.run_one_simulation()
     print("Finished", num_move)
 
