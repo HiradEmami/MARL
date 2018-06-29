@@ -16,7 +16,7 @@ class agent():
     #   1)   An integer "id"
     #   2)   The Extent of it's vision = (argVisionY, argVisionX)  #The default value is set at 5
     #   3)   Mode = that can be training, testing
-    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=0.1,argPosX=0,argPosY=0):
+    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=-0.1,argPosX=0,argPosY=0):
         # the position of the agent on grid
         self.positionX=argPosX
         self.positionY=argPosY
@@ -46,7 +46,12 @@ class agent():
         self.move_count = 0
         # cost of every action
         self.step_cost = argStepCost
+        self.network_folder = "agent_"+str(self.id)+"/"
+        self.reward_Shaping=False
         self.pad_value=-5
+
+
+
 
     # the function to reset the agent back to the initial state to start the simulation again
     def reset_agent(self):
@@ -78,7 +83,11 @@ class agent():
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
         # the size of input and output layers
-        self.input_size=(self.vision_x * self.vision_y*3)+2
+        if self.reward_Shaping:
+            self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
+        else:
+            self.input_size = (self.vision_x * self.vision_y *3)+ 2
+
         self.output_size=argOutputSize
         # defining the network
         self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate, self.hidden_activation, self.out_activation)
@@ -196,12 +205,17 @@ class agent():
         goal_board= self.get_goal_grid(argGrid=observabl_grid)
         self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
-        # print statement
-        print("Agent "+str(self.id)+" At position ("+str(self.positionX)+","+str(self.positionY)+")")
-        print("Observed grid: ")
-        print(observabl_grid)
-        print("List of Possible Moves")
-        print(self.possible_moves)
+
+        ####################
+        #  print statement #
+        ####################
+        # print("Agent "+str(self.id)+" At position ("+str(self.positionX)+","+str(self.positionY)+")")
+        # print("Observed grid: ")
+        # print(observabl_grid)
+        # print("List of Possible Moves")
+        # print(self.possible_moves)
+        ########################
+
         # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1
         # if the mode is set at training/developer we use the following steps
@@ -216,7 +230,8 @@ class agent():
             _, new_confidence, _ = self.get_best_move()
 
             # Calculate actual reward
-            previous_output_layer[self.previous_index] = self.discount * new_confidence
+            reward = self.get_reward()
+            previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
 
             # Backpropagate actual reward
             self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
@@ -244,6 +259,9 @@ class agent():
         self.move_count += 1
 
         return move, self.confidence
+
+    def get_reward(self):
+        return 0
 
     # Update the weights
     def final_update(self, opponent_score, own_score):
@@ -332,8 +350,6 @@ class agent():
             return "right"
         elif argIndex == 4:
             return "halt"
-
-
 
     def try_move_up(self, argboard):
         if (self.positionY - 1) > -1:
@@ -459,11 +475,27 @@ class agent():
                     new_list.append(0)
         return new_list
 
+    def set_scale_parameters(self, argBoard, argScaleMin, argScaleMax):
+        self.max_x_scale = len(argBoard[0])-1
+        self.max_y_scale = len(argBoard)-1
+        self.scale_max = argScaleMax
+        self.scale_min = argScaleMin
+
+    def scale(self,argNum, argMin, argMax, scale_max=2, scale_min=0):
+        return ((scale_max - scale_min) * ((argNum - argMin) / (argMax - argMin))) + scale_min
+
+    #function to shape the input layer
     def shape_input_layer(self,argObstacleList, argGoalList, argAgnetList):
+        #if the three generated lists are not in the same size theree should be an error
         if not (len(argAgnetList) == len(argGoalList)) or not (len(argGoalList) == len(argObstacleList)):
             print("ERROR! The Sizes of The Lists Does not Match")
         else:
-            counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+2
+
+            if self.reward_Shaping:
+                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+ 2 + 2
+            else:
+                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
+
             result_list = []
             for i in argObstacleList:
                 result_list.append(i)
@@ -472,8 +504,22 @@ class agent():
             for k in argAgnetList:
                 result_list.append(k)
 
-            result_list.append(self.positionX)
-            result_list.append(self.positionY)
+            # Adding the scaled Position X and position Y
+            node_x= self.scale(argNum=self.positionX,argMin=0, argMax=self.max_x_scale,
+                               scale_max=self.scale_max,scale_min=self.scale_min)
+
+            node_y= self.scale(argNum=self.positionY,argMin=0, argMax=self.max_y_scale,
+                               scale_max=self.scale_max,scale_min=self.scale_min)
+
+            result_list.append(node_x)
+            result_list.append(node_y)
+
+            if self.reward_Shaping:
+                result_list.append(0.2)
+                result_list.append(0.5)
+            else:
+                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
+
 
             if not len(result_list) == counter:
                 print("Failed to shape Input layer")

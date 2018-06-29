@@ -18,7 +18,7 @@ from tkinter import *
 from worldObject import *
 import copy
 
-
+# TODO: we should add the set_scaling for the agents after we load them / create them ... right after making them
 # TODO: must create a refresh method
 class world():
 
@@ -31,8 +31,13 @@ class world():
         self.Mode = argCreationMode
 
     def loadWolrd(self,argName):
+        print("\n#######################")
+        print("Loading the World : "+str(argName))
+        print("#######################\n")
         self.board, self.width, self.height, self.agents, self.obstacles, self.goals = load_world(argName)
-        print(self.height)
+        print("World Width: "+str(self.width))
+        print("World Height: "+str(self.height))
+        print("Making a copy of the grird ...")
         self.default_board = copy.copy(self.board)
 
 
@@ -82,25 +87,25 @@ class world():
 
 
     def move_up(self,argPlayer):
-        print("up")
+        # print("up")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         self.board[i-1][j]=argPlayer.id
         argPlayer.positionY =  argPlayer.positionY - 1
     def move_down(self,argPlayer):
-        print("down")
+        # print("down")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         self.board[i+1][j]=argPlayer.id
         argPlayer.positionY = argPlayer.positionY + 1
     def move_right(self,argPlayer):
-        print("right")
+        # print("right")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         self.board[i][j+1]=argPlayer.id
         argPlayer.positionX = argPlayer.positionX + 1
     def move_left(self,argPlayer):
-        print("left")
+        # print("left")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         self.board[i][j-1]=argPlayer.id

@@ -4,6 +4,9 @@ from world import *
 from system_utility import *
 from simulation import  *
 
+NUMBER_OF_AGENTS = 3
+WORLD_NAME = 'test'
+
 
 class worldGenrator():
     def __init__(self):
@@ -16,7 +19,7 @@ class worldGenrator():
         self.world = self.generate()
 
 
-    def generate(self,argName='test'):
+    def generate(self,argName=WORLD_NAME):
         self.name = argName
         # creating Obstacles
         new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
@@ -29,9 +32,14 @@ class worldGenrator():
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
-        num_agents=3
+        num_agents=NUMBER_OF_AGENTS
         for i in range(1,num_agents+1):
+            # creating the agent
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
+            # creating the network of the agent
+            new_agent.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
+                   argHidden_activation='sigmoid', argOut_activation='linear',argOutputSize=5)
+            # add the agent to the list
             self.agents.append(new_agent)
 
         self.world = world(argCreationMode="create")

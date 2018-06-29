@@ -5,24 +5,30 @@ from copy import copy
 from pip._vendor.distlib.compat import raw_input
 
 class simulation():
-    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False):
+    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
         self.developerMode=argDeveloperMode
         self.stepLimit=argSteplimit
+        self.rewardSharing=argrewardSharing
+        self.previous_collected_rewards=[]
 
     #function to reset the grid and reset player information
     def reset_settings(self):
-        print("reseting")
-        print("starting board")
-        print(self.starting_board)
-        print("world board")
-        print(self.world.board)
+        if self.developerMode:
+            print("reseting")
+            print("\nstarting board")
+            self.print_boards(self.starting_board)
+            print("\nworld board after simulation")
+            self.print_boards(self.world.board)
 
         self.world.board = self.copy_board(self.starting_board)
-        print("after reset")
-        print(self.world.board)
+
+        if  self.developerMode:
+            print("\nafter reset")
+            self.print_boards(self.world.board)
+
         for i in range(len(self.world.agents)):
             self.world.agents[i].reset_agent()
 
@@ -47,7 +53,6 @@ class simulation():
             elif remain == 0:
                 print("2 Number of remaining Agents: "+str(remain))
                 simulation_state = "finished"
-                simulation_state = "finished"
 
             else:
                 self.do_one_step()
@@ -61,6 +66,8 @@ class simulation():
         print("#######################")
         print("Resetting simulation!")
         self.reset_settings()
+
+
         return num_steps , self.world
 
 
@@ -82,7 +89,8 @@ class simulation():
             if self.developerMode:
                 print(self.world.board)
         elif argMove == "halt":
-            print("the Move was Halt")
+            if self.developerMode:
+                print("the Move was Halt")
 
         if self.developerMode:
             self.world.saveWorld('test')
@@ -113,3 +121,7 @@ class simulation():
                 new_row.append(argboard[i][j])
             new_list.append(new_row)
         return new_list
+
+    def print_boards(self,list):
+      for i in list:
+          print(i)

@@ -51,6 +51,25 @@ def save_grid(outputDirect,board):
     # closing the file
     file_1.close()
 
+def save_network_structure(outputDirect,argAgent):
+
+    # using the sample agent to save the information of the network and learning parameters
+    info=argAgent
+    # Opening / creating the save file
+    file = open(outputDirect +"/brain.txt",'w')
+    file.write(str(info.hidden_size)+"\n")
+    file.write(str(info.learning_rate)+"\n")
+    file.write(str(info.hidden_activation) + "\n")
+    file.write(str(info.out_activation) + "\n")
+    file.write(str(info.output_size) + "\n")
+    file.write(str(info.exploration) + "\n")
+    file.write(str(info.discount))
+
+    # file.write(str() + "\n")
+
+
+
+
 def save_info(outputDirect,agents,obstacles,goals,height,width):
     # saving the main info file
     file = open(outputDirect + "/info.txt", 'w')
@@ -58,12 +77,14 @@ def save_info(outputDirect,agents,obstacles,goals,height,width):
     file.write(str(len(agents)) + " " + str(len(obstacles)) + " " + str(len(goals))+"\n")
     file.write(str(height) + " " + str(width)+"\n")
 
+    print("Agent   : ID    Vision_x    Vision_y    Position_X    Position_Y    Step Cost    Mode")
     for i in range(len(agents)):
         print(len(agents),"TEST")
-        file.write(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
-                   +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
+        file.write(str(agents[i].id)+"    "+str(agents[i].vision_x)+"    "+str(agents[i].vision_y)+"    "
+                   +str(agents[i].positionX)+"    "+str(agents[i].positionY)+"    "+str(agents[i].step_cost)+"    "
                    +str(agents[i].mode)+"\n")
-        print(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
+
+        print("Agent "+str(i+1)+" :"+str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
                    +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
                    +str(agents[i].mode)+"\n")
 
@@ -78,8 +99,33 @@ def save_info(outputDirect,agents,obstacles,goals,height,width):
     # closing the file
     file.close()
 
+
+def load_network_structure(file):
+    # reading all the lines in the file
+    lines = file.readlines()
+   # print(lines)
+    parameters=[]
+    for i in lines:
+        temp=i.split("\n")
+        parameters.append(temp[0])
+    # print(parameters)
+
+    hidden_size=int(parameters[0])
+    learning_rate=float(parameters[1])
+    hidden_activation=str(parameters[2])
+    out_activation=str(parameters[3])
+    output_size=int(parameters[4])
+    exploration=float(parameters[5])
+    discount=int(parameters[6])
+
+    return hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount
+
+
+
 # PRIVATE function for importing the info file and converting them to appropriate lists
 def read_info(argFile):
+
+    print("\n******** Importing Agents and Objects ********\n")
 
     # reading all the lines in the file
     lines = argFile.readlines()
@@ -89,13 +135,17 @@ def read_info(argFile):
     len_obstacles=int(lengths[1])
     len_goals=int(lengths[2])
 
+    print("Number of Agents: "+str(len_agent)+"\n"
+          "Number of Obstacles: "+str(len_obstacles)+"\n"
+          "Number of GoalsL "+str(len_goals))
+
     worldinfo=lines[1].split(" ")
     world_height=int(worldinfo[0])
     world_width=int(worldinfo[1])
 
-    #print(len_agent,len_obstacles,len_goals,height,width)
+    # print(len_agent,len_obstacles,len_goals,height,width)
+    # print(len(lines))
 
-    print(len(lines))
     agents=[]
     goals=[]
     obstacles=[]
@@ -104,6 +154,8 @@ def read_info(argFile):
     num_agent=1
     num_goal=1
     num_obstacle=1
+
+    print("\nLoading Agents ...\n")
 
     while(num_agent<len_agent+1):
         info = lines[line_counter].split(" ")
@@ -116,20 +168,23 @@ def read_info(argFile):
         temp= str(info[6])
         temp2 = temp.split("\n")
         mode = temp2[0]
-
+        print("Agent : ID    Vision_x    Vision_y    Position_X    Position_Y    Step Cost    Mode")
+        print("Agent :  "+str(id)+"       "+str(vision_x)+"            "+str(vision_y)+"            "
+                   +str(positionX)+"              "+str(positionY)+"          "+str(step_cost)+"      "
+                   +str(mode)+"\n")
 
 
         new_agent = agent(argId=id, argVisionX=vision_x, argVisionY=vision_y, argPosX=positionX, argPosY=positionY,
                           argStepCost=step_cost, argMode=mode)
-        print(id, vision_x, vision_y, positionX, positionY,
-              step_cost, mode)
+        # print(id, vision_x, vision_y, positionX, positionY,step_cost, mode)
         agents.append(new_agent)
         line_counter+=1
         num_agent+=1
 
-    while(num_goal<len_goals+1):
+    print("\nLoading Obstacles ...\n")
+    while(num_obstacle<len_obstacles+1):
         info=lines[line_counter].split(" ")
-        print(info)
+        # print(info)
         id=int(info[0])
         width=int(info[1])
         height=int(info[2])
@@ -139,14 +194,16 @@ def read_info(argFile):
         temp2=temp.split("\n")
         type=temp2[0]
         new_obstacle= obstacle(argType=type,argId=id,argWidth=width,argHight=height,argX=x,argY=y)
-        num_goal+=1
+        num_obstacle += 1
         line_counter+=1
-
         obstacles.append(new_obstacle)
-        print(type,id,width,height,x,y)
 
+        print("Obstacle: type      id      width      height      x      y")
+        print("Obstacle:   "+str(type)+"    "+str(id)+"        "+str(width)+"          "
+              +str(height)+"         "+str(x)+"      "+str(y)+"\n")
 
-    while(num_obstacle<len_obstacles+1):
+    print("\nLoading Goals ...\n")
+    while(num_goal < len_goals + 1):
         info = lines[line_counter].split(" ")
         id = int(info[0])
         width = int(info[1])
@@ -156,12 +213,16 @@ def read_info(argFile):
         temp=str(info[5])
         temp2=temp.split("\n")
         color=temp2[0]
-        print(color, id, width, height, x, y)
+        # print(color, id, width, height, x, y)
         new_goal = goal(argColor=color, argId=id, argWidth=width, argHight=height, argX=x, argY=y)
 
         goals.append(new_goal)
-        num_obstacle+=1
+        num_goal+=1
         line_counter+=1
+
+        print("Goal:   color      id      width      height      x      y")
+        print("Goal:  " + str(color) + "       " + str(id) + "        " + str(width) + "         "
+              + str(height) + "         " + str(x) + "      " + str(y)+"\n")
 
     return world_width,world_height,agents,obstacles,goals
 
