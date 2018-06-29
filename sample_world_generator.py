@@ -6,6 +6,7 @@ from simulation import  *
 
 NUMBER_OF_AGENTS = 3
 WORLD_NAME = 'test'
+REWARD_SHARING = True
 
 
 class worldGenrator():
@@ -36,13 +37,19 @@ class worldGenrator():
         for i in range(1,num_agents+1):
             # creating the agent
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
+
             # creating the network of the agent
             new_agent.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
-                   argHidden_activation='sigmoid', argOut_activation='linear',argOutputSize=5)
+                   argHidden_activation='sigmoid', argOut_activation='linear',
+                                   argOutputSize=5,argRewardSharing=REWARD_SHARING,create_load_mode="create")
+
+            new_agent.set_network_folder(WORLD_NAME)
+
+            new_agent.save_network()
             # add the agent to the list
             self.agents.append(new_agent)
 
-        self.world = world(argCreationMode="create")
+        self.world = world(argCreationMode="create",worldName=self.name)
 
         self.world.createWorld(argWidth=self.width,argHeigth=self.height, argObstacleList=self.obstacles, goalList=self.goals, argAgentList=self.agents)
 
@@ -53,8 +60,12 @@ class worldGenrator():
         self.world.check_validity()
 
         self.world.saveWorld(argWorldName=self.name)
+
+        #testing the world
+        for i in self.world.agents:
+            i.NN.__del__()
         new_world = world(argCreationMode="load")
-        new_world.loadWolrd(argName=self.name)
+        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING)
 
         new_world.print_the_world()
 

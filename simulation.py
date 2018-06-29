@@ -34,9 +34,9 @@ class simulation():
 
     def run_one_simulation(self):
 
-        print("#######################")
-        print("Starting The simulation")
-        print("#######################")
+        print("\n###############################")
+        print("#   Starting a new simulation #")
+        print("###############################\n")
 
         num_steps=0
         simulation_state = "running_simulation"
@@ -61,9 +61,9 @@ class simulation():
                     print(num_steps, self.stepLimit, simulation_state)
                     continue_key = float(raw_input("Enter 1 to continue:"))
 
-        print("#######################")
-        print("Simulation Completed!")
-        print("#######################")
+        print("\n")
+        print("#   Simulation Completed!   #")
+        print("\n")
         print("Resetting simulation!")
         self.reset_settings()
 

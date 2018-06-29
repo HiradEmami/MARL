@@ -35,7 +35,8 @@ def save_world(argWorldName,board, obstacles, agents, goals, width, height):
             print("The new world is saved in MARL/: " + outputDirect)
         #call function to save the world file
         save_grid(outputDirect=outputDirect,board=board)
-        save_info(outputDirect=outputDirect,obstacles=obstacles,agents=agents,goals=goals,height=height,width=width)
+        save_info(outputDirect=outputDirect,obstacles=obstacles,agents=agents,goals=goals,
+                  height=height,width=width,name=argWorldName)
 
 
 #the save function that specifically saves the world, this function is also used for visualization
@@ -70,23 +71,24 @@ def save_network_structure(outputDirect,argAgent):
 
 
 
-def save_info(outputDirect,agents,obstacles,goals,height,width):
+def save_info(outputDirect,agents,obstacles,goals,height,width,name):
     # saving the main info file
     file = open(outputDirect + "/info.txt", 'w')
     # the primary loop for basic information
     file.write(str(len(agents)) + " " + str(len(obstacles)) + " " + str(len(goals))+"\n")
-    file.write(str(height) + " " + str(width)+"\n")
+    file.write(str(height) + " " + str(width) + " " +str(name)+"\n")
 
-    print("Agent   : ID    Vision_x    Vision_y    Position_X    Position_Y    Step Cost    Mode")
+
     for i in range(len(agents)):
-        print(len(agents),"TEST")
-        file.write(str(agents[i].id)+"    "+str(agents[i].vision_x)+"    "+str(agents[i].vision_y)+"    "
-                   +str(agents[i].positionX)+"    "+str(agents[i].positionY)+"    "+str(agents[i].step_cost)+"    "
-                   +str(agents[i].mode)+"\n")
 
-        print("Agent "+str(i+1)+" :"+str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
+        file.write(str(agents[i].id)+" "+str(agents[i].vision_x)+" "+str(agents[i].vision_y)+" "
                    +str(agents[i].positionX)+" "+str(agents[i].positionY)+" "+str(agents[i].step_cost)+" "
                    +str(agents[i].mode)+"\n")
+
+        print("Agent : ID    Vision_x    Vision_y    Position_X    Position_Y    Step Cost    Mode")
+        print("Agent :  "+str(agents[i].id)+"       "+str(agents[i].vision_x)+"            "
+              +str(agents[i].vision_y)+"            "+str(agents[i].positionX)+"              "+str(agents[i].positionY)
+              +"          "+str(agents[i].step_cost)+"      "+str(agents[i].mode)+"\n")
 
     for i in range(len(obstacles)):
         file.write(str(obstacles[i].id)+" "+str(obstacles[i].width)+" "+str(obstacles[i].height)+" "+str(obstacles[i].x)
@@ -133,15 +135,21 @@ def read_info(argFile):
     lengths=lines[0].split(" ")
     len_agent = int(lengths[0])
     len_obstacles=int(lengths[1])
-    len_goals=int(lengths[2])
+    jk =lengths[2].split("\n")
+    jk2=jk[0]
+    len_goals=int(jk2)
 
     print("Number of Agents: "+str(len_agent)+"\n"
           "Number of Obstacles: "+str(len_obstacles)+"\n"
-          "Number of GoalsL "+str(len_goals))
+          "Number of Goals "+str(len_goals))
 
     worldinfo=lines[1].split(" ")
     world_height=int(worldinfo[0])
     world_width=int(worldinfo[1])
+    sd = worldinfo[2].split("\n")
+    sd1= sd[0]
+    world_name=str(sd1)
+
 
     # print(len_agent,len_obstacles,len_goals,height,width)
     # print(len(lines))
@@ -224,7 +232,7 @@ def read_info(argFile):
         print("Goal:  " + str(color) + "       " + str(id) + "        " + str(width) + "         "
               + str(height) + "         " + str(x) + "      " + str(y)+"\n")
 
-    return world_width,world_height,agents,obstacles,goals
+    return world_width,world_height,agents,obstacles,goals,world_name
 
 
 # PRIVATE function for importing the world file and converting it to matrix
@@ -268,9 +276,9 @@ def load_world(worldFOlder):
 
     print("_________Files Imported_________")
     board=read_world(open(path+"/world.txt",'r'))
-    width, height, agents, obstacles, goals =read_info(open(path+"/info.txt",'r'))
+    width, height, agents, obstacles, goals,world_name =read_info(open(path+"/info.txt",'r'))
 
-    return board , width, height, agents, obstacles, goals
+    return board , width, height, agents, obstacles, goals,world_name
 
 def calculateTheScale(height,width):
     #if the world is square

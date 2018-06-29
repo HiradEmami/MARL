@@ -3,7 +3,7 @@ __author__ = 'Hirad Emami Alagha - s3218139'
 import copy
 import numpy as np
 import network as network
-import sys
+import sys, os
 import random
 
 
@@ -46,12 +46,18 @@ class agent():
         self.move_count = 0
         # cost of every action
         self.step_cost = argStepCost
-        self.network_folder = "agent_"+str(self.id)+"/"
+        self.network_folder = None
         self.reward_Shaping=False
         self.pad_value=-5
 
 
 
+    def load_networkd(self):
+        self.NN.__del__()
+        self.NN.loadNetwork(network_folder=self.network_folder)
+
+    def save_network(self):
+        self.NN.saveNetwork(network_folder=self.network_folder)
 
     # the function to reset the agent back to the initial state to start the simulation again
     def reset_agent(self):
@@ -74,15 +80,31 @@ class agent():
         self.positionX= posX
         self.positionY=posY
 
+    def set_network_folder(self,world_name):
+        primaryDirectory = 'Saved_Worlds'
+        outputDirect = primaryDirectory + '/world_' + str(world_name)
+        agent_folder = str("agent_" + str(self.id) + "/")
+        second_root = str(outputDirect)+'/tf_checkpoints/'
+        final_root = str(second_root)+str(agent_folder)
+
+        self.create_necessary_folders(primaryDirectory,outputDirect,second_root,final_root)
+        self.network_folder=final_root
+
+
+
+
     # The Create_brain function creates the primary neural netwokr that the agent is using the given
     # parameters. The function is called after creation of the agent
-    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation, argOut_activation,argOutputSize=5):
+    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation,
+                     argOut_activation,argOutputSize=5,create_load_mode="create",argRewardSharing=False):
         # the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
         # the size of input and output layers
+        self.reward_Shaping = argRewardSharing
+
         if self.reward_Shaping:
             self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
         else:
@@ -90,7 +112,15 @@ class agent():
 
         self.output_size=argOutputSize
         # defining the network
-        self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate, self.hidden_activation, self.out_activation)
+        if create_load_mode =="create":
+            print("Creating the network for agent "+str(self.id)+": ")
+        else:
+            print("Loading the network for agent " + str(self.id) + ": ")
+
+        self.NN = network.NeuralNet(self.input_size, self.hidden_size, self.output_size, self.learning_rate,
+                                    self.hidden_activation, self.out_activation)
+        if create_load_mode == "load":
+            self.NN.loadNetwork(network_folder=self.network_folder)
         # setting the exploration and discount of the network
         self.exploration = argExploration
         self.discount = argDiscount
@@ -475,9 +505,9 @@ class agent():
                     new_list.append(0)
         return new_list
 
-    def set_scale_parameters(self, argBoard, argScaleMin, argScaleMax):
-        self.max_x_scale = len(argBoard[0])-1
-        self.max_y_scale = len(argBoard)-1
+    def set_scale_parameters(self, argBoardWidth, argBoardHeight ,argScaleMin, argScaleMax):
+        self.max_x_scale = argBoardWidth -1
+        self.max_y_scale = argBoardHeight -1
         self.scale_max = argScaleMax
         self.scale_min = argScaleMin
 
@@ -539,3 +569,21 @@ class agent():
         else:
             print("The list is not convertable to 2d")
         return list
+
+    def create_necessary_folders(self,primaryDirectory,outputDirect,second_root,final_root):
+        if not os.path.exists(primaryDirectory):
+            print("creating The primary folder under " + primaryDirectory)
+            os.makedirs(primaryDirectory)
+            print(" The Folder for all saved worlds is created! \n The directory is : " + primaryDirectory)
+
+        if not os.path.exists(outputDirect):
+            print("creating The primary folder under " + outputDirect)
+            os.makedirs(outputDirect)
+
+        if not os.path.exists(second_root):
+            print("creating The TF Checkpoint folder under " + second_root)
+            os.makedirs(second_root)
+
+        if not os.path.exists(final_root):
+            print("creating The agent folder to save the network " + final_root)
+            os.makedirs(final_root)

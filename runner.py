@@ -11,13 +11,13 @@ from simulation import  *
 #TODO: Visualization should be completely fixed
 #TODO: Check if Agents make decision and move properly
 #TODO: Check if agnets have problem with moving out of index or wrong possible moves
-#TODO: The save and load functions need some serious update
+
 #TODO: Reward Shaping
 #TODO: Rewards
 
 DEVELOPER_MODE = False
 TRAINING_TESTING = "training"
-REWARD_SHARING = False
+REWARD_SHARING = True
 
 EPOCHES = 10
 NUM_SIMULATION = 100
@@ -29,14 +29,10 @@ WORLD_NAME="test"
 
 def train():
     new_world = world(argCreationMode=LOAD_CREATE)
-    new_world.loadWolrd(argName=WORLD_NAME)
+    new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING)
 
     if DEVELOPER_MODE:
         continue_key = float(raw_input("Enter 1 to continue: "))
-
-    for i in new_world.agents:
-        i.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
-                       argHidden_activation='sigmoid', argOut_activation='linear', argOutputSize=5)
 
     for i in range(NUM_SIMULATION):
         simulation_e = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS, argDeveloperMode=DEVELOPER_MODE)

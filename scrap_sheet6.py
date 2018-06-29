@@ -41,7 +41,8 @@ from system_utility import *
 
 sample_agent = agent(argId=1)
 sample_agent.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
-                   argHidden_activation='sigmoid', argOut_activation='linear',argOutputSize=5)
+                   argHidden_activation='sigmoid', argOut_activation='linear',
+                          argOutputSize=5,argRewardSharing=True,create_load_mode="create")
 
 
 argWorldName='test'
@@ -59,8 +60,8 @@ sample_agent.NN.forward_propagation(sampleINput)
 print(sample_agent.NN.output_layer)
 sample_agent.NN.forward_propagation(sampleINput2)
 print(sample_agent.NN.output_layer)
-sample_agent.NN.saveNetwork()
-sample_agent.NN.loadNetwork()
+sample_agent.save_network()
+sample_agent.load_networkd()
 sample_agent.NN.forward_propagation(sampleINput)
 print(sample_agent.NN.output_layer)
 
@@ -69,9 +70,10 @@ sample_agent.NN.__del__()
 print("FUCK1")
 sample_agent2 = agent(argId=2)
 sample_agent2.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
-                   argHidden_activation='sigmoid', argOut_activation='linear',argOutputSize=5)
+                   argHidden_activation='sigmoid', argOut_activation='linear',argOutputSize=5,argRewardSharing=True)
 print("FUCK2")
-sample_agent2.NN.loadNetwork()
+sample_agent2.network_folder = "agent_"+str(sample_agent.id)+"/"
+sample_agent2.load_networkd()
 print("FUCK3")
 print(sample_agent2.NN.output_layer)
 print("FUCK4")

@@ -18,8 +18,10 @@ from tkinter import *
 from worldObject import *
 import copy
 
-# TODO: we should add the set_scaling for the agents after we load them / create them ... right after making them
-# TODO: must create a refresh method
+#Global
+SCALE_BETWEEN_MIN = 0
+SCALE_BETWEEN_MAX = 2
+
 class world():
 
     #there are three modes for the world:
@@ -27,19 +29,65 @@ class world():
     #   2) "Create" Mode allows specific worlds to be generated
     #   3) "Load" Mode allows a previously generated world to be restored
 
-    def __init__(self,argCreationMode):
+    def __init__(self,argCreationMode,worldName=None):
         self.Mode = argCreationMode
+        self.name = worldName
 
-    def loadWolrd(self,argName):
+    #Function to load the entire world
+    def loadWolrd(self,argName,argRewardSharing):
+
         print("\n#######################")
         print("Loading the World : "+str(argName))
         print("#######################\n")
-        self.board, self.width, self.height, self.agents, self.obstacles, self.goals = load_world(argName)
+
+        # Getting the following information from the saved files
+        self.board, self.width, self.height, self.agents, self.obstacles, self.goals,self.name = load_world(argName)
+
+        print("World name: " + self.name)
         print("World Width: "+str(self.width))
         print("World Height: "+str(self.height))
+
+        # Copying the board for the reset
         print("Making a copy of the grird ...")
         self.default_board = copy.copy(self.board)
 
+        #creating the structure of the network
+        for i in self.agents:
+            i.set_scale_parameters(argBoardWidth=self.width, argBoardHeight=self.height ,
+                                   argScaleMin=SCALE_BETWEEN_MIN, argScaleMax=SCALE_BETWEEN_MAX)
+
+        self.run_scale_test()
+
+        outputDirect = 'Saved_Worlds' + '/world_' + str(argName)
+        hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount = \
+            load_network_structure(open(outputDirect + "/brain.txt", 'r'))
+
+        print("\nLoading Network Structures ...")
+        print("hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount")
+        print(hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount)
+
+        for i in self.agents:
+            i.set_network_folder(self.name)
+            i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
+                           argHidden_size=hidden_size,argHidden_activation=hidden_activation,
+                           argOut_activation='linear', argOutputSize=5,
+                           argRewardSharing=argRewardSharing,create_load_mode="load")
+
+
+    def run_scale_test(self):
+        print("\nRunning a test for scale:\n")
+        node_x = self.agents[0].scale(argNum=self.agents[0].positionX, argMin=0, argMax=self.agents[0].max_x_scale,
+                            scale_max=self.agents[0].scale_max, scale_min=self.agents[0].scale_min)
+
+        node_y = self.agents[0].scale(argNum=self.agents[0].positionY, argMin=0, argMax=self.agents[0].max_y_scale,
+                            scale_max=self.agents[0].scale_max, scale_min=self.agents[0].scale_min)
+
+        print("With a world that is "+str(self.width)+ " in width and "+str(self.height)+" in height ...\n"
+                + "the pisition of the first agent with (x,y) as : (" + str(self.agents[0].positionX)+","
+              + str(self.agents[0].positionY)+") is scaled to ("+str(node_x)+","+str(node_y)+") to be " +
+              "between "+str(self.agents[0].scale_min)+" and "+str(self.agents[0].scale_max)+".")
+
+        print("\ntest completed:\n")
 
     def saveWorld(self,argWorldName):
         save_world(argWorldName,width=self.width,height=self.height,goals=self.goals,agents=self.agents,

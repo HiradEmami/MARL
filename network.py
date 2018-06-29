@@ -92,12 +92,15 @@ class NeuralNet():
 
 
     def saveNetwork(self, network_folder,checkpoint_name=None):
-        self.saver.save(self.session, './tf_checkpoints/' +network_folder+ (
-        'network.ckpt' if checkpoint_name == None else (str(checkpoint_name) + ".ckpt")))
+        # self.saver.save(self.session, './tf_checkpoints/' +str(network_folder)+ (
+        # 'network.ckpt' if checkpoint_name == None else (str(checkpoint_name) + ".ckpt")))
+        print(str(network_folder))
+        self.saver.save(self.session, str(network_folder)+ (
+            'network.ckpt' if checkpoint_name == None else (str(checkpoint_name) + ".ckpt")))
 
     def loadNetwork(self, network_folder,checkpoint_name=None):
         self.saver.restore(self.session, (
-        tf.train.latest_checkpoint('./tf_checkpoints/'+network_folder) if checkpoint_name == None else (
+        tf.train.latest_checkpoint(str(network_folder)) if checkpoint_name == None else (
         './tf_checkpoints/' + str(checkpoint_name) + ".ckpt")))
 
         print("network loaded")
