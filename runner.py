@@ -9,22 +9,22 @@ from system_utility import *
 from simulation import  *
 
 #TODO: Visualization should be completely fixed
-#TODO: Check if Agents make decision and move properly
-#TODO: Check if agnets have problem with moving out of index or wrong possible moves
-
 #TODO: Reward Shaping
 #TODO: Rewards
 
-DEVELOPER_MODE = False
+
+DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
+PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 TRAINING_TESTING = "training"
 REWARD_SHARING = True
 
-EPOCHES = 10
-NUM_SIMULATION = 100
-STEP_LIMITS = 1000
+EPOCHES = 50
+NUM_SIMULATION = 1000
+STEP_LIMITS = 50
 
 LOAD_CREATE = "load"
 WORLD_NAME="test"
+
 
 
 def train():
@@ -35,9 +35,18 @@ def train():
         continue_key = float(raw_input("Enter 1 to continue: "))
 
     for i in range(NUM_SIMULATION):
-        simulation_e = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS, argDeveloperMode=DEVELOPER_MODE)
-        num_move, new_world = simulation_e.run_one_simulation()
-        print("Finished", num_move)
+        # create a simulation session
+        simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
+                                  argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
+                                  argPRINT_DETAILS=PRINT_SIMULATION_DETAILS)
+        # getting some of the information back
+        num_move, new_world = simulation_current.run_one_simulation()
+
+        if (i % EPOCHES)==0:
+            print(str(100*(i/NUM_SIMULATION))+"% Completed")
+
+        if PRINT_SIMULATION_DETAILS:
+            print("Finished", num_move)
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ import random
 
 # TODO: I should add the halt move properly to the network and every other function
 # TODO: I should make the functions for performing the moves properly
+# TODO Agent needs one prefvious reward 
 
 class agent():
     # An agent is initialized using:
@@ -48,6 +49,7 @@ class agent():
         self.step_cost = argStepCost
         self.network_folder = None
         self.reward_Shaping=False
+        self.previous_reward=0
         self.pad_value=-5
 
 
@@ -68,6 +70,8 @@ class agent():
         # setting the location of the agents back to default values
         self.positionX = self.default_positionX
         self.positionY = self.default_positionY
+        #set previous result to zero again
+        self.previous_reward = 0
 
 
     # setter for the default values
@@ -262,8 +266,11 @@ class agent():
             # Calculate actual reward
             reward = self.get_reward()
             previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
+            #assigining the previous reward so that simulation uses that for reward sharing if needed
+            self.previous_reward = reward
 
             # Backpropagate actual reward
+            # print("backprop", self.id)
             self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
         else:
             self.state = "Progressing"
@@ -291,7 +298,9 @@ class agent():
         return move, self.confidence
 
     def get_reward(self):
-        return 0
+        if self.reward_Shaping:
+            s=3
+        return self.step_cost
 
     # Update the weights
     def final_update(self, opponent_score, own_score):
@@ -310,6 +319,7 @@ class agent():
     # Using a forward pass, find the best move along with its index and confidence (= output node value)
     def get_best_move(self):
         # first we obtain the network's output using forward propogation given the input layer
+        # print("forwardPass",self.id)
         network_rewards = copy.copy(self.NN.forward_propagation(self.input_layer))
         # Obtain the output nodes (rewards) corresponding with legal moves
         # this returns two list :
