@@ -34,7 +34,7 @@ class world():
         self.name = worldName
 
     #Function to load the entire world
-    def loadWolrd(self,argName,argRewardSharing):
+    def loadWolrd(self,argName,argRewardSharing, argCommunication):
 
         print("\n#######################")
         print("Loading the World : "+str(argName))
@@ -71,7 +71,8 @@ class world():
             i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
                            argHidden_size=hidden_size,argHidden_activation=hidden_activation,
                            argOut_activation='linear', argOutputSize=5,
-                           argRewardSharing=argRewardSharing,create_load_mode="load")
+                           argRewardSharing=argRewardSharing,create_load_mode="load",
+                           argCommunication=argCommunication)
 
 
     def run_scale_test(self):

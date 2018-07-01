@@ -16,6 +16,8 @@ from simulation import  *
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 TRAINING_TESTING = "training"
+
+COMMUNICATION = False
 REWARD_SHARING = True
 
 EPOCHES = 50
@@ -29,7 +31,7 @@ WORLD_NAME="test"
 
 def train():
     new_world = world(argCreationMode=LOAD_CREATE)
-    new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING)
+    new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
 
     if DEVELOPER_MODE:
         continue_key = float(raw_input("Enter 1 to continue: "))

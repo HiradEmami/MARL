@@ -6,8 +6,9 @@ from simulation import  *
 
 NUMBER_OF_AGENTS = 3
 WORLD_NAME = 'test'
-REWARD_SHARING = True
 
+REWARD_SHARING = True
+COMMUNICATION = False
 
 class worldGenrator():
     def __init__(self):
@@ -41,7 +42,8 @@ class worldGenrator():
             # creating the network of the agent
             new_agent.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
                    argHidden_activation='sigmoid', argOut_activation='linear',
-                                   argOutputSize=5,argRewardSharing=REWARD_SHARING,create_load_mode="create")
+                                   argOutputSize=5,argRewardSharing=REWARD_SHARING,create_load_mode="create",
+                                   argCommunication=COMMUNICATION)
 
             new_agent.set_network_folder(WORLD_NAME)
 
@@ -65,9 +67,14 @@ class worldGenrator():
         for i in self.world.agents:
             i.NN.__del__()
         new_world = world(argCreationMode="load")
-        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING)
+        print("***********************************")
+        print(self.world.agents[0].input_size)
+        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
 
         new_world.print_the_world()
+
+        print(new_world.agents[0].input_size)
+        print("***********************************")
 
     def get_world(self):
         return self.world

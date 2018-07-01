@@ -48,7 +48,7 @@ class agent():
         # cost of every action
         self.step_cost = argStepCost
         self.network_folder = None
-        self.reward_Shaping=False
+        self.reward_Sharing=False
         self.previous_reward=0
         self.pad_value=-5
 
@@ -100,16 +100,18 @@ class agent():
     # The Create_brain function creates the primary neural netwokr that the agent is using the given
     # parameters. The function is called after creation of the agent
     def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation,
-                     argOut_activation,argOutputSize=5,create_load_mode="create",argRewardSharing=False):
+                     argOut_activation,argOutputSize = 5,create_load_mode = "create",
+                     argRewardSharing = False, argCommunication = False):
         # the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
         self.hidden_activation = argHidden_activation
         self.out_activation = argOut_activation
         # the size of input and output layers
-        self.reward_Shaping = argRewardSharing
+        self.reward_Sharing = argRewardSharing
+        self.communication = argCommunication
 
-        if self.reward_Shaping:
+        if self.communication:
             self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
         else:
             self.input_size = (self.vision_x * self.vision_y *3)+ 2
@@ -230,7 +232,7 @@ class agent():
         return new_board
 
     # the function for selecting the next action
-    def make_decision(self,argWGrid):
+    def make_decision(self,argWGrid,argAdditionalReward=None):
         # The portion of the grid that is observed by the agent currently, will be passed as argWGrid
         # This matrix is flattened to be used as the input layer of the Q-learning network
         observabl_grid = self.get_observable_board(argBoard=argWGrid)
@@ -264,7 +266,12 @@ class agent():
             _, new_confidence, _ = self.get_best_move()
 
             # Calculate actual reward
-            reward = self.get_reward()
+            # if we had to use rewardsharing we will get the additional reward that is provided
+            if self.reward_Sharing:
+                reward = self.get_reward(additional_reward=argAdditionalReward)
+            else: # Otherwise we dont have any additional reward a.k.a = 0
+                reward = self.get_reward()
+
             previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
             #assigining the previous reward so that simulation uses that for reward sharing if needed
             self.previous_reward = reward
@@ -297,8 +304,8 @@ class agent():
 
         return move, self.confidence
 
-    def get_reward(self):
-        if self.reward_Shaping:
+    def get_reward(self,additional_reward=0):
+        if self.reward_Sharing:
             s=3
         return self.step_cost
 
@@ -530,8 +537,8 @@ class agent():
         if not (len(argAgnetList) == len(argGoalList)) or not (len(argGoalList) == len(argObstacleList)):
             print("ERROR! The Sizes of The Lists Does not Match")
         else:
-
-            if self.reward_Shaping:
+            # If we had communication between agents we have to add two nods to the input layer
+            if self.communication:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+ 2 + 2
             else:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
@@ -554,7 +561,7 @@ class agent():
             result_list.append(node_x)
             result_list.append(node_y)
 
-            if self.reward_Shaping:
+            if self.communication:
                 result_list.append(0.2)
                 result_list.append(0.5)
             else:

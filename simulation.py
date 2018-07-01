@@ -3,7 +3,7 @@ from world import *
 from worldObject import *
 from copy import copy
 from pip._vendor.distlib.compat import raw_input
-
+# TODO: have to complete adding end_statement and rewardsharing
 class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False):
         self.world = argWorld
@@ -50,6 +50,7 @@ class simulation():
         simulation_state = "running_simulation"
 
         end_statement = "failed"
+
         while not(simulation_state== "finished"):
 
             remain=self.number_remaining_agents()
@@ -118,6 +119,9 @@ class simulation():
 
     # Function that makes all the agents that are not arrived to perform one action
     def do_one_step(self):
+        if (self.rewardSharing) and not(self.first_move):
+            self.set_previous_rewards()
+
         for i in self.world.agents:
             if not  (i.state=="arrived"):
                 move, confidence=i.make_decision(argWGrid=self.world.board)
@@ -158,9 +162,10 @@ class simulation():
             self.previous_collected_rewards.append(i.previous_reward)
         print(self.previous_collected_rewards)
 
-    def get_additional_reward(self,agentNum, argList):
+    def get_additional_reward(self,agentID):
+        agentNum = agentID - 1
         sum = 0
-        for i in range(len(argList)):
+        for i in range(len(self.previous_collected_rewards)):
             if not (i == agentNum):
-                sum += argList[i]
-        return sum / (len(argList) - 1)
+                sum += self.previous_collected_rewards[i]
+        return sum / (len(self.previous_collected_rewards) - 1)
