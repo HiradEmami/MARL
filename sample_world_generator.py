@@ -7,7 +7,7 @@ from simulation import  *
 NUMBER_OF_AGENTS = 4
 WORLD_NAME = 'test'
 
-REWARD_SHARING = True
+REWARD_SHARING = False
 COMMUNICATION = False
 
 class worldGenrator():

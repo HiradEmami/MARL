@@ -12,17 +12,18 @@ from simulation import  *
 #TODO: Reward Shaping
 #TODO: Rewards
 
+SAVE_THE_SESSION = False
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 TRAINING_TESTING = "training"
 
 COMMUNICATION = False
-REWARD_SHARING = True
+REWARD_SHARING = False
 
 EPOCHES = 50
-NUM_SIMULATION = 1000
-STEP_LIMITS = 50
+NUM_SIMULATION = 20000
+STEP_LIMITS = 60
 
 LOAD_CREATE = "load"
 WORLD_NAME="test"
@@ -35,8 +36,9 @@ def train():
 
     if DEVELOPER_MODE:
         continue_key = float(raw_input("Enter 1 to continue: "))
-
+    counter=0
     for i in range(NUM_SIMULATION):
+        counter +=1
         # create a simulation session
         simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
@@ -50,7 +52,10 @@ def train():
         if PRINT_SIMULATION_DETAILS:
             print("Finished", num_move)
 
+    if SAVE_THE_SESSION:
+        new_world.saveWorld(argWorldName=WORLD_NAME)
 
+    print("\nTotal number of completed simulations: "+str(counter))
 if __name__ == '__main__':
     print("this")
     print(NUM_SIMULATION, DEVELOPER_MODE)
