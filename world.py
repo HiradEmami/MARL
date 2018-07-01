@@ -139,25 +139,38 @@ class world():
         # print("up")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.board[i-1][j]=argPlayer.id
+        if self.board[i-1][j]>99:
+            argPlayer.state = "arrived"
+        else:
+            self.board[i-1][j]=argPlayer.id
         argPlayer.positionY =  argPlayer.positionY - 1
     def move_down(self,argPlayer):
         # print("down")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.board[i+1][j]=argPlayer.id
+        if self.board[i+1][j]>99:
+            argPlayer.state="arrived"
+        else:
+            self.board[i+1][j]=argPlayer.id
         argPlayer.positionY = argPlayer.positionY + 1
     def move_right(self,argPlayer):
         # print("right")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.board[i][j+1]=argPlayer.id
+        if self.board[i][j+1]>99:
+            argPlayer.state ="arrived"
+        else:
+            self.board[i][j+1]=argPlayer.id
         argPlayer.positionX = argPlayer.positionX + 1
     def move_left(self,argPlayer):
         # print("left")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.board[i][j-1]=argPlayer.id
+
+        if self.board[i][j-1]>99:
+            argPlayer.state="arrived"
+        else:
+            self.board[i][j - 1] = argPlayer.id
         argPlayer.positionX = argPlayer.positionX - 1
 
 

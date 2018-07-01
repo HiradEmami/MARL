@@ -4,10 +4,10 @@ from world import *
 from system_utility import *
 from simulation import  *
 
-NUMBER_OF_AGENTS = 4
+NUMBER_OF_AGENTS = 1
 WORLD_NAME = 'test'
 
-REWARD_SHARING = True
+REWARD_SHARING = False
 COMMUNICATION = False
 
 class worldGenrator():
@@ -15,8 +15,8 @@ class worldGenrator():
         self.obstacles = []
         self.agents = []
         self.goals = []
-        self.width=10
-        self.height = 15
+        self.width=5
+        self.height = 5
 
         self.world = self.generate()
 
@@ -24,15 +24,12 @@ class worldGenrator():
     def generate(self,argName=WORLD_NAME):
         self.name = argName
         # creating Obstacles
-        new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
-        new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=2, argX=6, argY=7)
+        new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=1,argHight=1,argX=1,argY=6)
         self.obstacles.append(new_obstacle_1)
-        self.obstacles.append(new_obstacle_2)
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=0,argY=0)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=3,argWidth=1,argX=9,argY=11)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=3,argX=0,argY=0)
         self.goals.append(new_goal_1)
-        self.goals.append(new_goal_2)
+
         # creating the agent
         num_agents=NUMBER_OF_AGENTS
         for i in range(1,num_agents+1):

@@ -86,11 +86,23 @@ class simulation():
             print("\n")
             print("Resetting simulation!")
 
+        self.final_check()
         # Once the simulation is over, call to reset the world and agents
         self.reset_settings()
 
         # at the end return number of performed steps, updated world ,
         return num_steps , self.world
+
+    def final_check(self):
+        num_fail=0
+        num_win =0
+        for i in self.world.agents:
+            if i.state == "arrived":
+                num_win +=1
+                i.perform_final_update()
+            else:
+                num_fail +=1
+        print(num_win,num_fail)
 
     # Function that connects the decision that agents make to the functions of performing and executing the actions
     def perform_move(self,argAgent,argMove):
@@ -121,11 +133,30 @@ class simulation():
     def do_one_step(self):
         if (self.rewardSharing) and not(self.first_move):
             self.set_previous_rewards()
+            for i in self.world.agents:
+                if not  (i.state=="arrived"):
+                    additional_reward= self.get_additional_reward(i.id)
+                    move, confidence=i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    self.perform_move(argAgent=i,argMove=move)
 
-        for i in self.world.agents:
-            if not  (i.state=="arrived"):
-                move, confidence=i.make_decision(argWGrid=self.world.board)
-                self.perform_move(argAgent=i,argMove=move)
+        elif (self.rewardSharing) and (self.first_move):
+            self.first_move = False
+            for i in self.world.agents:
+                 if not (i.state == "arrived"):
+                    additional_reward =0
+                    move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    self.perform_move(argAgent=i, argMove=move)
+        else:
+            for i in self.world.agents:
+                 if not (i.state == "arrived"):
+                    move, confidence = i.make_decision(argWGrid=self.world.board)
+                    #continue_key = float(raw_input("Enter 1 to continue:"))
+
+                    self.perform_move(argAgent=i, argMove=move)
+                    #print(move, i.positionX, i.positionY )
+
+
+
 
 
     # The function for counting the number of remaining agents on the board
@@ -160,7 +191,9 @@ class simulation():
         # For all the agents of the world append their previous reward to the list
         for i in self.world.agents:
             self.previous_collected_rewards.append(i.previous_reward)
-        print(self.previous_collected_rewards)
+
+        if self.developerMode:
+            print(self.previous_collected_rewards,self.first_move)
 
     def get_additional_reward(self,agentID):
         agentNum = agentID - 1

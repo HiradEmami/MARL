@@ -10,7 +10,7 @@ import random
 
 # TODO: I should add the halt move properly to the network and every other function
 # TODO: I should make the functions for performing the moves properly
-# TODO Agent needs one prefvious reward 
+# TODO Agent needs one prefvious reward
 
 class agent():
     # An agent is initialized using:
@@ -500,7 +500,6 @@ class agent():
         halt_move = (True,"halt","halt")
         #since Halting is always possible , it is automatically added to the acceptable moves
         acceptable.append(halt_move)
-        #rejected.append(halt_move)
         # returning the acceptable and rejected moves
         if not (len(acceptable)+len(rejected)==self.output_size):
             print("ERROR! the sum of accepted and rejected are bigger than output layer size:\n")
