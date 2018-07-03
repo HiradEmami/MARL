@@ -4,8 +4,12 @@ from worldObject import *
 from copy import copy
 from pip._vendor.distlib.compat import raw_input
 # TODO: have to complete adding end_statement and rewardsharing
+
+WIN_REWARD = 2.0
+LOSE_REWARD = - 2.0
+
 class simulation():
-    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False):
+    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,argMode="train"):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
@@ -16,6 +20,7 @@ class simulation():
         self.previous_collected_rewards=[]
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
+        self.mode = argMode
 
 
     #function to reset the grid and reset player information
@@ -86,23 +91,49 @@ class simulation():
             print("\n")
             print("Resetting simulation!")
 
-        self.final_check()
+        #evaluate the performance
+        result, num_arrived, num_failed = self.evaluate_performance()
         # Once the simulation is over, call to reset the world and agents
         self.reset_settings()
 
         # at the end return number of performed steps, updated world ,
-        return num_steps , self.world
+        return num_steps , self.world , result, num_arrived, num_failed
 
-    def final_check(self):
-        num_fail=0
-        num_win =0
+    def evaluate_performance(self):
+        num_failed=0
+        num_arrived =0
+        reward = []
+
         for i in self.world.agents:
+            #updating the reward
             if i.state == "arrived":
-                num_win +=1
-                i.perform_final_update()
+                num_arrived +=1
+                if self.mode == "train":
+                    i.perform_final_update(argreward=WIN_REWARD)
+                reward.append(WIN_REWARD)
             else:
-                num_fail +=1
-        print(num_win,num_fail)
+                num_failed +=1
+                if self.mode == "train":
+                    i.perform_final_update(argreward=LOSE_REWARD)
+                reward.append(LOSE_REWARD)
+
+        # result can be success or fail
+        result = None
+        #TODO: this can be an additional reward for the way they share goals
+        additional_reward=0
+        if num_arrived == len(reward):
+            result = "successful"
+            # additional_reward = 0.5
+        else:
+            result = "fail"
+            # additional_reward = -0.5
+
+        # Perform the final backpropogation
+       # for i in range(len(self.world.agents)):
+           # if self.mode == "train":
+              # self.world.agents[i].perform_final_update(argreward=reward[i])
+        return result, num_arrived , num_failed
+        
 
     # Function that connects the decision that agents make to the functions of performing and executing the actions
     def perform_move(self,argAgent,argMove):
@@ -202,3 +233,6 @@ class simulation():
             if not (i == agentNum):
                 sum += self.previous_collected_rewards[i]
         return sum / (len(self.previous_collected_rewards) - 1)
+
+    def get_score(self):
+        return 0

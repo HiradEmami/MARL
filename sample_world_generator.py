@@ -4,11 +4,19 @@ from world import *
 from system_utility import *
 from simulation import  *
 
-NUMBER_OF_AGENTS = 4
+NUMBER_OF_AGENTS = 6
 WORLD_NAME = 'test'
 
 REWARD_SHARING = False
 COMMUNICATION = False
+
+EXPLORATION = 0.2
+LEARNING_RATE = 0.001
+DISCOUNT = 1
+HIDDEN_ACTIVATION = 'sigmoid'
+OUT_ACTIVATION = 'linear'
+HIDDEN_SIZE = 50
+OUT_SIZE = 5
 
 class worldGenrator():
     def __init__(self):
@@ -40,9 +48,10 @@ class worldGenrator():
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
 
             # creating the network of the agent
-            new_agent.create_brain(argExploration=0.2, argDiscount=1, argLearning_rate=0.001, argHidden_size=50,
-                   argHidden_activation='sigmoid', argOut_activation='linear',
-                                   argOutputSize=5,argRewardSharing=REWARD_SHARING,create_load_mode="create",
+            new_agent.create_brain(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
+                                   argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
+                                   argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
+                                   argRewardSharing=REWARD_SHARING,create_load_mode="create",
                                    argCommunication=COMMUNICATION)
 
             new_agent.set_network_folder(WORLD_NAME)

@@ -21,6 +21,7 @@ import copy
 #Global
 SCALE_BETWEEN_MIN = 0
 SCALE_BETWEEN_MAX = 2
+RAND=5
 
 class world():
 
@@ -139,6 +140,8 @@ class world():
         # print("up")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
+        #if it the tile is a goal change the state of the state to arrived
+        self.check_player(argPlayer)
         if self.board[i-1][j]>99:
             argPlayer.state = "arrived"
         else:
@@ -148,6 +151,8 @@ class world():
         # print("down")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
+        # if it the tile is a goal change the state of the state to arrived
+        self.check_player(argPlayer)
         if self.board[i+1][j]>99:
             argPlayer.state="arrived"
         else:
@@ -157,6 +162,8 @@ class world():
         # print("right")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
+        self.check_player(argPlayer)
+        # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
             argPlayer.state ="arrived"
         else:
@@ -166,7 +173,8 @@ class world():
         # print("left")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-
+        self.check_player(argPlayer)
+        # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
             argPlayer.state="arrived"
         else:
@@ -222,7 +230,10 @@ class world():
             print("The test was not successful. Missing Obstacle!")
         #if either one of the objects were missing this function will invalidate the board
         return False
-
+    def check_player(self,argPlayer):
+        temp = rd.randint(0,250)
+        if temp<RAND:
+            argPlayer.state="arrived"
     #function for setting the objects on the grid
     def place_objects(self,object):
         #for each object

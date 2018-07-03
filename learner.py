@@ -322,7 +322,7 @@ class agent():
         # Reset things after a round
         self.reset_agent()
 
-    def perform_final_update(self):
+    def perform_final_update(self,argreward):
         # we first obtain our previous input layer by copying the input of NN
         previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
         previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
@@ -333,7 +333,7 @@ class agent():
         # Calculate actual reward
         # if we had to use rewardsharing we will get the additional reward that is provided
 
-        reward = 2.0
+        reward = argreward
         previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
         # assigining the previous reward so that simulation uses that for reward sharing if needed
         self.previous_reward = reward
@@ -499,8 +499,11 @@ class agent():
         #creating halt move manually:
         halt_move = (True,"halt","halt")
         #since Halting is always possible , it is automatically added to the acceptable moves
-        acceptable.append(halt_move)
-        #rejected.append(halt_move)
+        if len(acceptable)>=1:
+            rejected.append(halt_move)
+        else:
+            acceptable.append(halt_move)
+
         # returning the acceptable and rejected moves
         if not (len(acceptable)+len(rejected)==self.output_size):
             print("ERROR! the sum of accepted and rejected are bigger than output layer size:\n")
