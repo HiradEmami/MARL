@@ -21,10 +21,10 @@ TRAINING_TESTING = "training"
 COMMUNICATION = False
 REWARD_SHARING = False
 
-EPOCHES = 500
-NUM_SIMULATION = 20000
+EPOCHES = 50
+NUM_SIMULATION = 5000
 NUM_TEST = 100
-STEP_LIMITS = 30
+STEP_LIMITS = 12
 
 LOAD_CREATE = "load"
 WORLD_NAME="test"
@@ -50,6 +50,7 @@ def train():
         # getting some of the information back
         num_move, new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
 
+
         # print("In training the state of agent is " + new_world.agents[0].mode)
         if (i % EPOCHES)==0 and not i==0:
             print(str(100*(i/NUM_SIMULATION))+"% Completed")
@@ -63,7 +64,10 @@ def train():
     if SAVE_THE_SESSION:
         new_world.saveWorld(argWorldName=WORLD_NAME)
 
+
     print("\nTotal number of completed simulations: "+str(simulation_counter))
+    print("\n Final test for the model")
+    new_world.saveWorld(argWorldName=WORLD_NAME)
 
 def test(argworld, argNumberofTest):
     # print("In testing before change the state of agent is " + argworld.agents[0].mode)

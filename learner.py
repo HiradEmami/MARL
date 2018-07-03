@@ -323,6 +323,7 @@ class agent():
         self.reset_agent()
 
     def perform_final_update(self,argreward):
+
         # we first obtain our previous input layer by copying the input of NN
         previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
         previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
@@ -334,7 +335,9 @@ class agent():
         # if we had to use rewardsharing we will get the additional reward that is provided
 
         reward = argreward
-        previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
+
+        #previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
+        previous_output_layer[self.previous_index] =  reward
         # assigining the previous reward so that simulation uses that for reward sharing if needed
         self.previous_reward = reward
 

@@ -21,7 +21,7 @@ import copy
 #Global
 SCALE_BETWEEN_MIN = 0
 SCALE_BETWEEN_MAX = 2
-RAND=5
+RAND=-1
 
 class world():
 
@@ -233,6 +233,7 @@ class world():
     def check_player(self,argPlayer):
         temp = rd.randint(0,250)
         if temp<RAND:
+            print("PROC")
             argPlayer.state="arrived"
     #function for setting the objects on the grid
     def place_objects(self,object):
