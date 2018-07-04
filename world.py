@@ -140,8 +140,9 @@ class world():
         # print("up")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
+        self.board[i][j]=0
         #if it the tile is a goal change the state of the state to arrived
-        self.check_player(argPlayer)
+        #self.check_player(argPlayer)
         if self.board[i-1][j]>99:
             argPlayer.state = "arrived"
         else:
@@ -152,7 +153,7 @@ class world():
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         # if it the tile is a goal change the state of the state to arrived
-        self.check_player(argPlayer)
+        #self.check_player(argPlayer)
         if self.board[i+1][j]>99:
             argPlayer.state="arrived"
         else:
@@ -162,7 +163,7 @@ class world():
         # print("right")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.check_player(argPlayer)
+       # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
             argPlayer.state ="arrived"
@@ -173,7 +174,7 @@ class world():
         # print("left")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
-        self.check_player(argPlayer)
+       # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
             argPlayer.state="arrived"

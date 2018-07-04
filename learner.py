@@ -289,14 +289,21 @@ class agent():
                 index, move = self.get_random_move()
                 output_layer = self.NN.forward_propagation(self.input_layer)
                 self.confidence = output_layer[index]
+
                 # Use network forward pass
             else:
                 index, self.confidence, move = self.get_best_move()
 
         # testing
         else:
-            #j ust simply forward pass to obtain the move
-            index, self.confidence, move = self.get_best_move()
+            # first we try a chance on a random move for exploration
+            if random.uniform(0,1) < self.exploration:
+                index, move = self.get_random_move()
+                output_layer = self.NN.forward_propagation(self.input_layer)
+                self.confidence = output_layer[index]
+            else:
+                #j ust simply forward pass to obtain the move
+                index, self.confidence, move = self.get_best_move()
 
         # uodating counter values and previous index variable
         self.previous_index = index
@@ -307,20 +314,6 @@ class agent():
     def get_reward(self,additional_reward=0):
         reward = self.step_cost + additional_reward
         return reward
-
-    # Update the weights
-    def final_update(self, opponent_score, own_score):
-        if self.mode == "train":
-            corrected_output_layer = copy.copy(self.NN.output_layer)
-            if opponent_score < own_score:
-                corrected_output_layer[self.previous_index] = 1
-            elif opponent_score == own_score:
-                corrected_output_layer[self.previous_index] = 0
-            elif opponent_score > own_score:
-                corrected_output_layer[self.previous_index] = -1
-            self.NN.back_propagation(corrected_output_layer)
-        # Reset things after a round
-        self.reset_agent()
 
     def perform_final_update(self,argreward):
 

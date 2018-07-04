@@ -4,13 +4,13 @@ from world import *
 from system_utility import *
 from simulation import  *
 
-NUMBER_OF_AGENTS = 6
+NUMBER_OF_AGENTS = 4
 WORLD_NAME = 'test'
 
 REWARD_SHARING = False
 COMMUNICATION = False
 
-EXPLORATION = 0.2
+EXPLORATION = 0.05
 LEARNING_RATE = 0.001
 DISCOUNT = 1
 HIDDEN_ACTIVATION = 'sigmoid'

@@ -5,11 +5,12 @@ from copy import copy
 from pip._vendor.distlib.compat import raw_input
 # TODO: have to complete adding end_statement and rewardsharing
 
-WIN_REWARD = 2.0
-LOSE_REWARD = - 2.0
+WIN_REWARD = 1.0
+LOSE_REWARD = - 1.0
+VISUALIZATION_FOLDER = 'test'
 
 class simulation():
-    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,argMode="train"):
+    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,argMode="train",argVISUALIZATION=False):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
@@ -21,6 +22,7 @@ class simulation():
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
         self.mode = argMode
+        self.visualization=argVISUALIZATION
 
 
     #function to reset the grid and reset player information
@@ -81,6 +83,9 @@ class simulation():
                 self.do_one_step()
                 num_steps += 1
                 # If developermode is set to True , print information adn wait for user's input to continue
+                if self.visualization:
+                    continue_key = float(raw_input("Enter 1 to continue:"))
+                    self.world.saveWorld(argWorldName=VISUALIZATION_FOLDER)
                 if self.developerMode:
                     print(num_steps, self.stepLimit, simulation_state)
                     continue_key = float(raw_input("Enter 1 to continue:"))
@@ -128,10 +133,6 @@ class simulation():
             result = "fail"
             # additional_reward = -0.5
 
-        # Perform the final backpropogation
-       # for i in range(len(self.world.agents)):
-           # if self.mode == "train":
-              # self.world.agents[i].perform_final_update(argreward=reward[i])
         return result, num_arrived , num_failed
         
 
@@ -185,10 +186,6 @@ class simulation():
 
                     self.perform_move(argAgent=i, argMove=move)
                     #print(move, i.positionX, i.positionY )
-
-
-
-
 
     # The function for counting the number of remaining agents on the board
     def number_remaining_agents(self):

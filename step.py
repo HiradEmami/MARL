@@ -5,67 +5,80 @@ from tkinter import *
 import time,random
 
 
-initial=True
-if initial:
-    obstacles = []
-    obstacle1 = obstacle("wall", argWidth=2, argHight=2, argX=4, argY=4, argId=-1)
-    obstacle2= obstacle("wall",argWidth=2, argHight=2, argX=6, argY=8, argId=-2)
-
-    obstacles.append(obstacle1)
-    obstacles.append(obstacle2)
+from worldObject import *
+from learner import *
+from world import *
+from system_utility import *
+from simulation import  *
 
 
-    goals = []
-    goa11 = goal("red", argWidth=1, argHight=1, argX=8, argY=9, argId=100)
-    goa12 = goal("blue", argWidth=4, argHight=4, argX=0, argY=0, argId=101)
+def perform_move(world, argAgent, argMove):
+    if argMove == "up":
+        world.move_up(argPlayer=argAgent)
 
-    goals.append(goa11)
-    goals.append(goa12)
+    elif argMove == "down":
+        world.move_down(argPlayer=argAgent)
 
-    agents = []
-    num_agents =8
-    for i in range(num_agents):
-        a=learner.agent(argId=i+1)
-        agents.append(a)
+    elif argMove == "left":
+        world.move_left(argPlayer=argAgent)
 
-    world = wd.world("Create")
-    world.createWorld(argWidth=10, argHeigth=15, argObstacleInfo=obstacles, argAgentInfo=agents, goalInfo=goals)
-    print(world.board)
-    world.saveWorld(argWorldName="test")
-    print("hello")
-    test=True
-    counter = 0
-
-    while(test):
-
-        counter=random.randint(0,3)
-        if counter==0:
-            counter +=1
-            time.sleep(0.5)
-        elif counter == 1:
-            world.try_move_left(agents[4])
-            world.saveWorld(argWorldName="test")
-            time.sleep(0.5)
-        elif counter == 2:
-            world.try_move_up(agents[4])
-            world.saveWorld(argWorldName="test")
-            time.sleep(0.5)
-        else:
-            world.try_move_right(agents[4])
-            world.saveWorld(argWorldName="test")
-            time.sleep(0.5)
+    elif argMove == "right":
+        world.move_right(argPlayer=argAgent)
 
 
 
 
 
 
+# Would save the world after training
+SAVE_THE_SESSION = True
+
+DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
+PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
+PRINT_TEST_DETAILS = False
+TRAINING_TESTING = "training"
+
+COMMUNICATION = False
+REWARD_SHARING = True
+
+EPOCHES = 50
+NUM_SIMULATION = 500
+NUM_TEST = 100
+STEP_LIMITS = 60
+
+LOAD_CREATE = "load"
+WORLD_NAME="test"
+
+file_name = "test"
+file_name = "world_" + file_name
+primaryDirectory='Saved_Worlds'
+
+path=primaryDirectory + "/" + file_name
+
+new_world = world(argCreationMode=LOAD_CREATE)
+new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
+
+for i in new_world.agents:
+    i.mode = "testing"
+
+successful = 0
+failed = 0
+total_num_arrived = 0
+total_num_failed = 0
 
 
-
-
-
-
-
+test_simulation =  simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
+                                  argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
+                                  argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train",
+                                                   argVISUALIZATION=True)
+num_move, argworld, result, num_arrived, num_failed = simulation_current.run_one_simulation()
+total_num_arrived += num_arrived
+total_num_failed += num_failed
+if result == "successful":
+    successful += 1
+else:
+    failed += 1
+accuracy = (successful/1)*100.0
+print("\nFinal Test Accuracy: " + str(accuracy) + "%")
 
 
