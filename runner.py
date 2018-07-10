@@ -11,27 +11,30 @@ from simulation import  *
 
 
 # Would save the world after training
-SAVE_THE_SESSION = True
+SAVE_THE_SESSION = False
+VISUALIZATION = False
+
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = False
 TRAINING_TESTING = "training"
+MARL_MODE = "decentralized"
 
 COMMUNICATION = False
 REWARD_SHARING = False
 
-EPOCHES = 50
-NUM_SIMULATION = 2000
+EPOCHES = 500
+NUM_SIMULATION = 10000
 NUM_TEST = 100
-STEP_LIMITS = 40
+STEP_LIMITS = 50
 
 LOAD_CREATE = "load"
 WORLD_NAME="test"
 
 
 # The primary function to train the decentralized system
-def train():
+def decentralized_train():
     # Loading the world and the agents
     new_world = world(argCreationMode=LOAD_CREATE)
     new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
@@ -47,7 +50,7 @@ def train():
         simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train"
-                                        ,argVISUALIZATION=False)
+                                        ,argVISUALIZATION=VISUALIZATION)
         # getting some of the information back
         num_move, new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
 
@@ -56,7 +59,7 @@ def train():
         if (i % EPOCHES)==0 and not i==0:
             print(result)
             print(str(100*(i/NUM_SIMULATION))+"% Completed")
-            test(argworld=new_world, argNumberofTest=NUM_TEST)
+            decentralized_test(argworld=new_world, argNumberofTest=NUM_TEST)
         # print("In training after the state of agent is "+new_world.agents[0].mode)
 
         if PRINT_SIMULATION_DETAILS:
@@ -69,10 +72,10 @@ def train():
 
     print("\nTotal number of completed simulations: "+str(simulation_counter))
     print("\n Final test for the model")
-    test(argworld=new_world, argNumberofTest=1)
+    decentralized_test(argworld=new_world, argNumberofTest=1)
     new_world.saveWorld(argWorldName=WORLD_NAME)
 
-def test(argworld, argNumberofTest):
+def decentralized_test(argworld, argNumberofTest):
   #setting the mode to testing
 
     # print("In testing after change the state of agent is " + argworld.agents[0].mode)
@@ -87,11 +90,13 @@ def test(argworld, argNumberofTest):
         print("\nTesting ...")
 
     for i in range(argNumberofTest):
+
         test_simulation = simulation(argWorld=argworld, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="test",
-                                                           argVISUALIZATION=False)
+                                                           argVISUALIZATION=VISUALIZATION)
         num_move, argworld, result, num_arrived, num_failed = test_simulation.run_one_simulation()
+
 
         total_num_arrived += num_arrived
         total_num_failed += num_failed
@@ -113,6 +118,5 @@ def test(argworld, argNumberofTest):
 
 
 if __name__ == '__main__':
-    print("this")
-    print(NUM_SIMULATION, DEVELOPER_MODE)
-    train()
+    if MARL_MODE == "decentralized":
+        decentralized_train()

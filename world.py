@@ -134,7 +134,21 @@ class world():
                         foundLocation = True
 
 
-
+    def test_randomization_prepration(self):
+        for i in self.agents:
+            foundLocation = False
+            while not (foundLocation):
+                # picking a random position of the agent
+                temp_positionX = rd.randint(0, self.width - 1)
+                temp_positionY = rd.randint(0, self.height - 1)
+                if (self.board[temp_positionY][temp_positionX] == 0):
+                    # updating the board
+                    self.board[i.positionY][i.positionX] = 0
+                    # setting the default value for the agents
+                    self.board[temp_positionY][temp_positionX]=i.id
+                    i.positionX = temp_positionX
+                    i.positionY = temp_positionY
+                    foundLocation = True
 
     def move_up(self,argPlayer):
         # print("up")

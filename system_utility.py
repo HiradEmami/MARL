@@ -184,6 +184,7 @@ def read_info(argFile):
 
         new_agent = agent(argId=id, argVisionX=vision_x, argVisionY=vision_y, argPosX=positionX, argPosY=positionY,
                           argStepCost=step_cost, argMode=mode)
+        new_agent.set_default_positions()
         # print(id, vision_x, vision_y, positionX, positionY,step_cost, mode)
         agents.append(new_agent)
         line_counter+=1

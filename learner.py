@@ -6,7 +6,9 @@ import network as network
 import sys, os
 import random
 
-
+#if Randomized_move <  0  then no random move is used
+#if Randomized_move > 0 then appropriate number of random moves are included
+RANDOMIZED_MOVE = 0.05
 
 # TODO: I should add the halt move properly to the network and every other function
 # TODO: I should make the functions for performing the moves properly
@@ -297,7 +299,7 @@ class agent():
         # testing
         else:
             # first we try a chance on a random move for exploration
-            if random.uniform(0,1) < self.exploration:
+            if random.uniform(0,1) < 0.05:
                 index, move = self.get_random_move()
                 output_layer = self.NN.forward_propagation(self.input_layer)
                 self.confidence = output_layer[index]

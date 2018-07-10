@@ -46,6 +46,8 @@ class simulation():
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
 
+
+
     def run_one_simulation(self):
         # If print_details is set to True print some statements
         if self.print_details:
@@ -57,7 +59,8 @@ class simulation():
         simulation_state = "running_simulation"
 
         end_statement = "failed"
-
+        if self.mode == "test":
+            self.world.test_randomization_prepration()
         while not(simulation_state== "finished"):
 
             remain=self.number_remaining_agents()

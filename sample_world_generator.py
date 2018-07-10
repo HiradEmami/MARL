@@ -10,13 +10,15 @@ WORLD_NAME = 'test'
 REWARD_SHARING = False
 COMMUNICATION = False
 
-EXPLORATION = 0.05
+EXPLORATION = 0.2
 LEARNING_RATE = 0.001
 DISCOUNT = 1
 HIDDEN_ACTIVATION = 'sigmoid'
 OUT_ACTIVATION = 'linear'
 HIDDEN_SIZE = 50
 OUT_SIZE = 5
+
+RANDOMIZATION_TEST = False
 
 class worldGenrator():
     def __init__(self):
@@ -76,10 +78,25 @@ class worldGenrator():
         for i in self.world.agents:
             i.NN.__del__()
         new_world = world(argCreationMode="load")
+        if RANDOMIZATION_TEST:
+            print("\n##########################")
+            print("     Test Randomization Check")
+            print("##########################\n")
+            print("Before Randomization:")
+            print(self.world.board)
+            print("Randomized:")
+            self.world.test_randomization_prepration()
+            print(self.world.board)
+            print("Restored:")
+            for i in self.world.agents:
+                i.reset_agent()
+            self.world.board = self.world.default_board
+            print(self.world.board)
 
 
         new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
-
+        for i in new_world.agents:
+            print(i.default_positionX,i.default_positionY)
         new_world.print_the_world()
 
     def get_world(self):
