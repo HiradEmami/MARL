@@ -11,7 +11,7 @@ from simulation import  *
 
 
 # Would save the world after training
-SAVE_THE_SESSION = False
+SAVE_THE_SESSION = True
 VISUALIZATION = False
 
 
@@ -25,9 +25,9 @@ COMMUNICATION = False
 REWARD_SHARING = False
 
 EPOCHES = 500
-NUM_SIMULATION = 10000
+NUM_SIMULATION = 20000
 NUM_TEST = 100
-STEP_LIMITS = 50
+STEP_LIMITS = 120
 
 LOAD_CREATE = "load"
 WORLD_NAME="test"

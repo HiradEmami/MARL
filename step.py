@@ -39,7 +39,7 @@ PRINT_TEST_DETAILS = False
 TRAINING_TESTING = "training"
 
 COMMUNICATION = False
-REWARD_SHARING = True
+REWARD_SHARING = False
 
 EPOCHES = 50
 NUM_SIMULATION = 500
@@ -69,7 +69,7 @@ total_num_failed = 0
 
 test_simulation =  simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
-                                  argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train",
+                                  argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="test",
                                                    argVISUALIZATION=True)
 num_move, argworld, result, num_arrived, num_failed = simulation_current.run_one_simulation()
 total_num_arrived += num_arrived
