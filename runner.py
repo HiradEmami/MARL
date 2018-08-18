@@ -7,34 +7,42 @@ from learner import *
 from world import *
 from system_utility import *
 from simulation import  *
+from centralized_controller import *
+from centralized_simulation import *
+import math
 
-
-
-# Would save the world after training
-SAVE_THE_SESSION = True
-VISUALIZATION = False
-
-
-DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
-PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
-PRINT_TEST_DETAILS = False
+################################
+#       Input of Variables       #
+################################
+LOAD_CREATE = "load"
+WORLD_NAME="test"
 TRAINING_TESTING = "training"
 MARL_MODE = "decentralized"
+
+# Would save the world after training
+SAVE_THE_SESSION = False
+VISUALIZATION = False
 
 COMMUNICATION = False
 REWARD_SHARING = False
 
-EPOCHES = 500
-NUM_SIMULATION = 20000
+DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
+PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
+PRINT_TEST_DETAILS = False
+
+NUM_SIMULATION = 3000
+
+EPOCHES = math.floor(0.05 * NUM_SIMULATION)
+
 NUM_TEST = 100
-STEP_LIMITS = 120
-
-LOAD_CREATE = "load"
-WORLD_NAME="test"
-
+STEP_LIMITS = 100
+################################
+#       End of Variables       #
+################################
 
 # The primary function to train the decentralized system
 def decentralized_train():
+    print("\nStarting Decentralized System:\n")
     # Loading the world and the agents
     new_world = world(argCreationMode=LOAD_CREATE)
     new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
@@ -68,6 +76,9 @@ def decentralized_train():
 
     if SAVE_THE_SESSION:
         new_world.saveWorld(argWorldName=WORLD_NAME)
+        for i in new_world.agents:
+            i.save_network()
+
 
 
     print("\nTotal number of completed simulations: "+str(simulation_counter))
@@ -115,8 +126,15 @@ def decentralized_test(argworld, argNumberofTest):
         i.mode = "training"
     # print("In testing after second change the state of agent is " + argworld.agents[0].mode)
 
+def centralized_train():
+    print("\nStarting Centralized System:\n")
 
+def centralized_test():
+    print('This')
 
 if __name__ == '__main__':
+    print("Epoches: "+str(EPOCHES))
     if MARL_MODE == "decentralized":
         decentralized_train()
+    elif MARL_MODE == "centralized":
+        centralized_train()

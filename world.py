@@ -16,6 +16,7 @@ import os
 from system_utility import *
 from tkinter import *
 from worldObject import *
+from centralized_controller import *
 import copy
 
 #Global
@@ -35,7 +36,7 @@ class world():
         self.name = worldName
 
     #Function to load the entire world
-    def loadWolrd(self,argName,argRewardSharing, argCommunication):
+    def loadWolrd(self,argName,argRewardSharing, argCommunication,argCentralized=False):
 
         print("\n#######################")
         print("Loading the World : "+str(argName))
@@ -58,22 +59,24 @@ class world():
                                    argScaleMin=SCALE_BETWEEN_MIN, argScaleMax=SCALE_BETWEEN_MAX)
 
         self.run_scale_test()
+        if not argCentralized:
+            outputDirect = 'Saved_Worlds' + '/world_' + str(argName)
+            hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount = \
+                load_network_structure(open(outputDirect + "/brain.txt", 'r'))
 
-        outputDirect = 'Saved_Worlds' + '/world_' + str(argName)
-        hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount = \
-            load_network_structure(open(outputDirect + "/brain.txt", 'r'))
+            print("\nLoading Network Structures ...")
+            print("hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount")
+            print(hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount)
 
-        print("\nLoading Network Structures ...")
-        print("hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount")
-        print(hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount)
-
-        for i in self.agents:
-            i.set_network_folder(self.name)
-            i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
-                           argHidden_size=hidden_size,argHidden_activation=hidden_activation,
-                           argOut_activation='linear', argOutputSize=5,
-                           argRewardSharing=argRewardSharing,create_load_mode="load",
-                           argCommunication=argCommunication)
+            for i in self.agents:
+                i.set_network_folder(self.name)
+                i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
+                               argHidden_size=hidden_size,argHidden_activation=hidden_activation,
+                               argOut_activation='linear', argOutputSize=5,
+                               argRewardSharing=argRewardSharing,create_load_mode="load",
+                               argCommunication=argCommunication)
+        else:
+            print("\nLoading The Centralized Meta Agent")
 
 
     def run_scale_test(self):

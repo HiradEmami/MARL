@@ -8,7 +8,7 @@ import random
 
 #if Randomized_move <  0  then no random move is used
 #if Randomized_move > 0 then appropriate number of random moves are included
-RANDOMIZED_MOVE = 0.05
+RANDOMIZED_MOVE = -4
 
 # TODO: I should add the halt move properly to the network and every other function
 # TODO: I should make the functions for performing the moves properly

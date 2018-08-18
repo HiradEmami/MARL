@@ -5,24 +5,7 @@ import sys, os
 import random
 
 class controller():
-    def __init__(self,argId,argVisionX=3,argVisionY=3,argMode="train",argStepCost=-0.1,argPosX=0,argPosY=0):
-        # the position of the agent on grid
-        self.positionX=argPosX
-        self.positionY=argPosY
-        # placeholder for the initial position
-        self.default_positionX=0
-        self.default_positionY=0
-        self.set_default_positions()
-        # the id of the agent
-        self.id = argId
-        # setting the cost of
-        # the vision of the agent, portion of the word it observs
-        self.vision_x = argVisionX
-        self.vision_y = argVisionY
-        # Calculating the margine of his vision using "set_margines" function
-        self.set_margines()
-        # The area of the board that agent sees is set at 0
-        self.vision = []
+    def __init__(self,argMode="train",argStepCost=-0.1):
         # the State of the player can be:
         #   1) "initialized"
         #   3) "progressing : selecting next action
@@ -76,6 +59,116 @@ class controller():
         #   1) the index of the output layer that corresponds to the move we chose
         self.previous_index = None
         self.previous_input_layer = None
+
+        # the function for selecting the next action
+
+    def make_decision(self, argWGrid, argAgent,argAdditionalReward=None):
+        # The portion of the grid that is observed by the agent currently, will be passed as argWGrid
+        # This matrix is flattened to be used as the input layer of the Q-learning network
+        current_agent = argAgent
+        input_grid = argWGrid
+        obstacle_board = self.get_obstacle_grid(argGrid=input_grid)
+        agent_board = self.get_agent_grid(argGrid=input_grid,argAgent=current_agent)
+        goal_board = self.get_goal_grid(argGrid=input_grid)
+        self.input_layer = self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board,
+                                                  argAgnetList=agent_board,argAgent=current_agent)
+        self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid,argAgent=current_agent)
+
+        ####################
+        #  print statement #
+        ####################
+        # print("Agent "+str(self.id)+" At position ("+str(self.positionX)+","+str(self.positionY)+")")
+        # print("Observed grid: ")
+        # print(observabl_grid)
+        # print("List of Possible Moves")
+        # print(self.possible_moves)
+        ########################
+
+        # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
+        self.confidence = -1
+        # if the mode is set at training/developer we use the following steps
+        # note that this would only work if the state is not initialized
+        # THis means no attempt at back prop if it is the first step
+        if not (self.mode == "testing") and not (self.state == "initialized"):
+            # we first obtain our previous input layer by copying the input of NN
+            previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
+            previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
+
+            # Obtain network's current output (a1)
+            _, new_confidence, _ = self.get_best_move()
+
+            # Calculate actual reward
+            # if we had to use rewardsharing we will get the additional reward that is provided
+            if self.reward_Sharing:
+                reward = self.get_reward(additional_reward=argAdditionalReward)
+            else:  # Otherwise we dont have any additional reward a.k.a = 0
+                reward = self.get_reward()
+
+            previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
+            # assigining the previous reward so that simulation uses that for reward sharing if needed
+            self.previous_reward = reward
+
+            # Backpropagate actual reward
+            # print("backprop", self.id)
+            self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
+        else:
+            self.state = "Progressing"
+
+        # training : this statement selects the move
+        if not (self.mode == "testing"):
+            # first we try a chance on a random move for exploration
+            if random.uniform(0, 1) < self.exploration:
+                index, move = self.get_random_move()
+                output_layer = self.NN.forward_propagation(self.input_layer)
+                self.confidence = output_layer[index]
+
+                # Use network forward pass
+            else:
+                index, self.confidence, move = self.get_best_move()
+
+        # testing
+        else:
+            # first we try a chance on a random move for exploration
+            if random.uniform(0, 1) < 0.05:
+                index, move = self.get_random_move()
+                output_layer = self.NN.forward_propagation(self.input_layer)
+                self.confidence = output_layer[index]
+            else:
+                # j ust simply forward pass to obtain the move
+                index, self.confidence, move = self.get_best_move()
+
+        # uodating counter values and previous index variable
+        self.previous_index = index
+        self.move_count += 1
+
+        return move, self.confidence
+
+    def get_reward(self, additional_reward=0):
+        reward = self.step_cost + additional_reward
+        return reward
+
+    def perform_final_update(self, argreward):
+
+        # we first obtain our previous input layer by copying the input of NN
+        previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
+        previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)
+
+        # Obtain network's current output (a1)
+        _, new_confidence, _ = self.get_best_move()
+
+        # Calculate actual reward
+        # if we had to use rewardsharing we will get the additional reward that is provided
+
+        reward = argreward
+
+        # previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
+        previous_output_layer[self.previous_index] = reward
+        # assigining the previous reward so that simulation uses that for reward sharing if needed
+        self.previous_reward = reward
+
+        # Backpropagate actual reward
+        # print("backprop", self.id)
+        self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
 
     # Using a forward pass, find the best move along with its index and confidence (= output node value)
     def get_best_move(self):
