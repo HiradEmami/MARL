@@ -12,7 +12,7 @@ LOSE_REWARD = - 1.0
 VISUALIZATION_FOLDER = 'test'
 
 
-class simulation():
+class centralized_simulation():
     def __init__(self, argWorld, argSteplimit, argDeveloperMode=False, argrewardSharing=False, argPRINT_DETAILS=False,
                  argMode="train", argVISUALIZATION=False):
         self.world = argWorld
@@ -169,7 +169,9 @@ class simulation():
             for i in self.world.agents:
                 if not (i.state == "arrived"):
                     additional_reward = self.get_additional_reward(i.id)
-                    move, confidence = i.make_decision(argWGrid=self.world.board, argAdditionalReward=additional_reward)
+                    move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
+                                                                                       argAgent=i,
+                                                                                argAdditionalReward=additional_reward)
                     self.perform_move(argAgent=i, argMove=move)
 
         elif (self.rewardSharing) and (self.first_move):
@@ -177,12 +179,15 @@ class simulation():
             for i in self.world.agents:
                 if not (i.state == "arrived"):
                     additional_reward = 0
-                    move, confidence = i.make_decision(argWGrid=self.world.board, argAdditionalReward=additional_reward)
+                    move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
+                                                                                       argAgent= i,
+                                                                                argAdditionalReward=additional_reward)
                     self.perform_move(argAgent=i, argMove=move)
         else:
             for i in self.world.agents:
                 if not (i.state == "arrived"):
-                    move, confidence = i.make_decision(argWGrid=self.world.board)
+                    move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
+                                                                                       argAgent= i,)
                     # continue_key = float(raw_input("Enter 1 to continue:"))
 
                     self.perform_move(argAgent=i, argMove=move)

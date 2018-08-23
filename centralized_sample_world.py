@@ -48,23 +48,26 @@ class worldGenrator():
         for i in range(1,num_agents+1):
             # creating the agent
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
-
-            # creating the network of the agent
-            new_agent.create_brain(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
-                                   argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
-                                   argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
-                                   argRewardSharing=REWARD_SHARING,create_load_mode="create",
-                                   argCommunication=COMMUNICATION)
-
-            new_agent.set_network_folder(WORLD_NAME)
-
-            new_agent.save_network()
             # add the agent to the list
             self.agents.append(new_agent)
+
+        # create the meta agent
+        meta_centralized_agent = controller()
+        # creating the network of the Meta agent
+        meta_centralized_agent.build_network(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
+                               argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
+                               argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
+                               argRewardSharing=REWARD_SHARING,create_load_mode="create")
+
+        meta_centralized_agent.set_network_folder(WORLD_NAME)
+
+        meta_centralized_agent.save_network()
 
         self.world = world(argCreationMode="create",worldName=self.name)
 
         self.world.createWorld(argWidth=self.width,argHeigth=self.height, argObstacleList=self.obstacles, goalList=self.goals, argAgentList=self.agents)
+
+        self.world.set_meta_controller_agent(argMetaController=meta_centralized_agent)
 
         print(self.world.board)
         print(len(self.world.goals))

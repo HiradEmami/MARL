@@ -76,7 +76,21 @@ class world():
                                argRewardSharing=argRewardSharing,create_load_mode="load",
                                argCommunication=argCommunication)
         else:
-            print("\nLoading The Centralized Meta Agent")
+            print("\nLoading The Centralized Meta Agent\n")
+            self.centralized_meta_agent = controller()
+            outputDirect = 'Saved_Worlds' + '/world_' + str(argName)
+            hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount = \
+                load_network_structure(open(outputDirect + "/brain.txt", 'r'))
+
+            print("\nLoading Network Structures ...")
+            print("hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount")
+            print(hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount)
+
+            self.centralized_meta_agent.build_network(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
+                               argHidden_size=hidden_size, argHidden_activation=hidden_activation,
+                               argOut_activation='linear', argOutputSize=5,
+                               argRewardSharing=argRewardSharing, create_load_mode="load")
+
 
 
     def run_scale_test(self):
@@ -119,6 +133,9 @@ class world():
         self.place_agents(argMargine_constraint=argAgent_Location_Constraint)
         #taking a copy of the world
         self.default_board = copy.copy(self.board)
+
+    def set_meta_controller_agent(self,argMetaController):
+        self.centralized_meta_agent = argMetaController
 
 
     def place_agents(self,argMargine_constraint=True):

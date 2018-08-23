@@ -8,6 +8,7 @@ from pip._vendor.distlib.compat import raw_input
 WIN_REWARD = 1.0
 LOSE_REWARD = - 1.0
 VISUALIZATION_FOLDER = 'test'
+RANDOMIZATION = True
 
 class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,argMode="train",argVISUALIZATION=False):
@@ -59,7 +60,7 @@ class simulation():
         simulation_state = "running_simulation"
 
         end_statement = "failed"
-        if self.mode == "test":
+        if self.mode == "test" and RANDOMIZATION:
             self.world.test_randomization_prepration()
         while not(simulation_state== "finished"):
 

@@ -22,7 +22,36 @@ class controller():
         self.reward_Sharing=False
         self.previous_reward=0
 
+    def set_network_folder(self,world_name):
+        primaryDirectory = 'Saved_Worlds'
+        outputDirect = primaryDirectory + '/world_' + str(world_name)
+        agent_folder = str("meta_agent/")
+        second_root = str(outputDirect)+'/tf_checkpoints/'
+        final_root = str(second_root)+str(agent_folder)
 
+        self.create_necessary_folders(primaryDirectory,outputDirect,second_root,final_root)
+        self.network_folder=final_root
+
+    def save_network(self):
+        self.NN.saveNetwork(network_folder=self.network_folder)
+
+    def create_necessary_folders(self, primaryDirectory, outputDirect, second_root, final_root):
+        if not os.path.exists(primaryDirectory):
+            print("creating The primary folder under " + primaryDirectory)
+            os.makedirs(primaryDirectory)
+            print(" The Folder for all saved worlds is created! \n The directory is : " + primaryDirectory)
+
+        if not os.path.exists(outputDirect):
+            print("creating The primary folder under " + outputDirect)
+            os.makedirs(outputDirect)
+
+        if not os.path.exists(second_root):
+            print("creating The TF Checkpoint folder under " + second_root)
+            os.makedirs(second_root)
+
+        if not os.path.exists(final_root):
+            print("creating The agent folder to save the network " + final_root)
+            os.makedirs(final_root)
 
     def build_network(self, argboard_width, argboard_height, argExploration, argDiscount, argLearning_rate,
                       argHidden_size,argHidden_activation,argOut_activation, argOutputSize = 5,
