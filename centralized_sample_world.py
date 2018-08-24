@@ -57,7 +57,8 @@ class worldGenrator():
         meta_centralized_agent.build_network(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
                                argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
                                argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
-                               argRewardSharing=REWARD_SHARING,create_load_mode="create")
+                               argRewardSharing=REWARD_SHARING,create_load_mode="create"
+                                             ,argboard_width=self.width, argboard_height=self.height)
 
         meta_centralized_agent.set_network_folder(WORLD_NAME)
 
@@ -75,11 +76,11 @@ class worldGenrator():
         print(len(self.world.obstacles))
         self.world.check_validity()
 
-        self.world.saveWorld(argWorldName=self.name)
+        self.world.saveWorld(argWorldName=self.name,argCentralized=True,argMetaAgent=self.world.centralized_meta_agent)
 
         #testing the world
-        for i in self.world.agents:
-            i.NN.__del__()
+
+        self.world.centralized_meta_agent.NN.__del__()
         new_world = world(argCreationMode="load")
         if RANDOMIZATION_TEST:
             print("\n##########################")
@@ -97,7 +98,8 @@ class worldGenrator():
             print(self.world.board)
 
 
-        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
+        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION
+                            ,argCentralized=True)
         for i in new_world.agents:
             print(i.default_positionX,i.default_positionY)
         new_world.print_the_world()

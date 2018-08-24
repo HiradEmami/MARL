@@ -78,6 +78,9 @@ class world():
         else:
             print("\nLoading The Centralized Meta Agent\n")
             self.centralized_meta_agent = controller()
+            self.centralized_meta_agent.set_network_folder(self.name)
+            self.centralized_meta_agent.set_scale_parameters(argBoardWidth=self.width, argBoardHeight=self.height ,
+                                   argScaleMin=SCALE_BETWEEN_MIN, argScaleMax=SCALE_BETWEEN_MAX)
             outputDirect = 'Saved_Worlds' + '/world_' + str(argName)
             hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount = \
                 load_network_structure(open(outputDirect + "/brain.txt", 'r'))
@@ -89,7 +92,9 @@ class world():
             self.centralized_meta_agent.build_network(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
                                argHidden_size=hidden_size, argHidden_activation=hidden_activation,
                                argOut_activation='linear', argOutputSize=5,
-                               argRewardSharing=argRewardSharing, create_load_mode="load")
+                               argRewardSharing=argRewardSharing, create_load_mode="load"
+                                                      , argboard_width=self.width,
+                                                      argboard_height=self.height)
 
 
 
@@ -108,9 +113,11 @@ class world():
 
         print("\ntest completed:\n")
 
-    def saveWorld(self,argWorldName):
+    def saveWorld(self,argWorldName,argCentralized=False,argMetaAgent=None):
         save_world(argWorldName,width=self.width,height=self.height,goals=self.goals,agents=self.agents,
-                   obstacles=self.obstacles,board=self.board)
+                   obstacles=self.obstacles,board=self.board,
+                   argCentralized=argCentralized,argMetaAgent=argMetaAgent)
+
 
 
     def generate_random_world(self):

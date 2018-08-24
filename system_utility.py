@@ -12,7 +12,7 @@ from learner import *
 #global variables
 primaryDirectory='Saved_Worlds'
 
-def save_world(argWorldName,board, obstacles, agents, goals, width, height):
+def save_world(argWorldName,board, obstacles, agents, goals, width, height, argCentralized=False,argMetaAgent = None):
 #The primary Directory for worlds is a folder called Saved_worlds
 
         #The output folder to save all the information of the world is saved as:
@@ -36,7 +36,11 @@ def save_world(argWorldName,board, obstacles, agents, goals, width, height):
         #call function to save the world file
         save_grid(outputDirect=outputDirect,board=board)
         save_info(outputDirect=outputDirect,obstacles=obstacles,agents=agents,goals=goals,
-                  height=height,width=width,name=argWorldName)
+                  height=height,width=width,name=argWorldName,argCentralized=argCentralized)
+        if argCentralized:
+            save_network_structure(outputDirect=outputDirect,argAgent=argMetaAgent)
+        else:
+            save_network_structure(outputDirect=outputDirect,argAgent=agents[0])
 
 
 #the save function that specifically saves the world, this function is also used for visualization
@@ -71,7 +75,7 @@ def save_network_structure(outputDirect,argAgent):
 
 
 
-def save_info(outputDirect,agents,obstacles,goals,height,width,name):
+def save_info(outputDirect,agents,obstacles,goals,height,width,name,argCentralized=False):
     # saving the main info file
     file = open(outputDirect + "/info.txt", 'w')
     # the primary loop for basic information

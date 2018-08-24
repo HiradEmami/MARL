@@ -118,12 +118,12 @@ class centralized_simulation():
             if i.state == "arrived":
                 num_arrived += 1
                 if self.mode == "train":
-                    i.perform_final_update(argreward=WIN_REWARD)
+                    self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
                 reward.append(WIN_REWARD)
             else:
                 num_failed += 1
                 if self.mode == "train":
-                    i.perform_final_update(argreward=LOSE_REWARD)
+                    self.world.centralized_meta_agent.perform_final_update(argreward=LOSE_REWARD)
                 reward.append(LOSE_REWARD)
 
         # result can be success or fail

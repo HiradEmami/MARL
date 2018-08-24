@@ -78,6 +78,7 @@ class worldGenrator():
 
         self.world.saveWorld(argWorldName=self.name)
 
+
         #testing the world
         for i in self.world.agents:
             i.NN.__del__()
