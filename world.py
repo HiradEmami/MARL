@@ -72,7 +72,7 @@ class world():
                 i.set_network_folder(self.name)
                 i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
                                argHidden_size=hidden_size,argHidden_activation=hidden_activation,
-                               argOut_activation='linear', argOutputSize=5,
+                               argOut_activation='linear', argOutputSize=output_size,
                                argRewardSharing=argRewardSharing,create_load_mode="load",
                                argCommunication=argCommunication)
         else:
