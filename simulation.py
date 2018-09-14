@@ -3,7 +3,8 @@ from world import *
 from worldObject import *
 from copy import copy
 from pip._vendor.distlib.compat import raw_input
-# TODO: have to complete adding end_statement and rewardsharing
+# TODO: self.PrepareCommunication should check if it is true, if so for all agents use the function to set communication
+
 
 WIN_REWARD = 1.0
 LOSE_REWARD = - 1.0
@@ -11,7 +12,8 @@ VISUALIZATION_FOLDER = 'test'
 RANDOMIZATION = True
 
 class simulation():
-    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,argMode="train",argVISUALIZATION=False):
+    def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,
+                 argMode="train",argVISUALIZATION=False,argcommunication = False):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
@@ -24,6 +26,7 @@ class simulation():
         self.first_move = True
         self.mode = argMode
         self.visualization=argVISUALIZATION
+        self.communication = argcommunication
 
 
     #function to reset the grid and reset player information
@@ -43,6 +46,9 @@ class simulation():
 
         for i in range(len(self.world.agents)):
             self.world.agents[i].reset_agent()
+
+        for j in range(len(self.world.goals)):
+            self.world.goals[j].reset_goal()
 
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
@@ -118,12 +124,24 @@ class simulation():
             if i.state == "arrived":
                 num_arrived +=1
                 if self.mode == "train":
-                    i.perform_final_update(argreward=WIN_REWARD)
+                    if not self.communication:
+                        i.perform_final_update(argreward_1=WIN_REWARD)
+                    else:
+                        if i.arrived_at_goal == 1:
+                            i.perform_final_update(argreward_1=WIN_REWARD,argreward_2=0)
+                        elif i.arrived_at_goal == 2:
+                            i.perform_final_update(argreward_1=0,argreward_2=WIN_REWARD)
                 reward.append(WIN_REWARD)
             else:
                 num_failed +=1
                 if self.mode == "train":
-                    i.perform_final_update(argreward=LOSE_REWARD)
+                    if not self.communication:
+                        i.perform_final_update(argreward_1=LOSE_REWARD)
+                    else:
+                        if i.arrived_at_goal == 1:
+                            i.perform_final_update(argreward_1=LOSE_REWARD,argreward_2=0)
+                        elif i.arrived_at_goal == 2:
+                            i.perform_final_update(argreward_1=0,argreward_2=LOSE_REWARD)
                 reward.append(LOSE_REWARD)
 
         # result can be success or fail
@@ -166,12 +184,13 @@ class simulation():
 
     # Function that makes all the agents that are not arrived to perform one action
     def do_one_step(self):
+        self.prepare_communication()
         if (self.rewardSharing) and not(self.first_move):
             self.set_previous_rewards()
             for i in self.world.agents:
                 if not  (i.state=="arrived"):
                     additional_reward= self.get_additional_reward(i.id)
-                    move, confidence=i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
                     self.perform_move(argAgent=i,argMove=move)
 
         elif (self.rewardSharing) and (self.first_move):
@@ -189,6 +208,31 @@ class simulation():
 
                     self.perform_move(argAgent=i, argMove=move)
                     #print(move, i.positionX, i.positionY )
+
+    def prepare_communication(self):
+        if self.communication:
+            targets = self.count_target_goals()
+            goal_agent = self.count_agents_in_goal()
+            for i in self.world.agents:
+                i.set_communication_lists(argGoal_agents=goal_agent,argTarget=targets)
+
+
+    # Function that counts how many agents are going to a goal
+    def count_target_goals(self):
+        goal_1 = 0
+        goal_2 = 0
+        for i in self.world.agents:
+            if i.target_goal == 1:
+                goal_1 += 1
+            elif i.target_goal == 2:
+                goal_2 += 1
+        return [goal_1 , goal_2]
+
+    def count_agents_in_goal(self):
+        result = []
+        for i in self.world.goals:
+            result.append(i.num_agent)
+        return result
 
     # The function for counting the number of remaining agents on the board
     def number_remaining_agents(self):

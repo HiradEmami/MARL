@@ -10,16 +10,18 @@ from simulation import  *
 from centralized_controller import *
 from centralized_simulation import *
 import math
+import time
+
 
 ################################
 #       Input of Variables       #
 ################################
 LOAD_CREATE = "load"
-WORLD_NAME="test"
-#WORLD_NAME = 'test_centralized'
+#WORLD_NAME="test"
+WORLD_NAME = 'test_centralized'
 TRAINING_TESTING = "training"
-MARL_MODE = "decentralized"
-#MARL_MODE = "centralized"
+#MARL_MODE = "decentralized"
+MARL_MODE = "centralized"
 
 # Would save the world after training
 SAVE_THE_SESSION = False
@@ -30,9 +32,9 @@ REWARD_SHARING = False
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
-PRINT_TEST_DETAILS = False
+PRINT_TEST_DETAILS = True
 
-NUM_SIMULATION = 300
+NUM_SIMULATION = 3000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
 
@@ -50,6 +52,9 @@ def decentralized_train():
     new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
     training_score = []
 
+    for i in new_world.agents:
+        i.set_total_agent_number(len(new_world.agents))
+
     if DEVELOPER_MODE:
         continue_key = float(raw_input("Enter 1 to continue: "))
 
@@ -61,7 +66,8 @@ def decentralized_train():
         simulation_current = simulation(argWorld=new_world, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train"
-                                        ,argVISUALIZATION=VISUALIZATION)
+                                        ,argVISUALIZATION=VISUALIZATION
+                                        ,argcommunication=COMMUNICATION)
         # getting some of the information back
         num_move, new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
 
@@ -111,7 +117,8 @@ def decentralized_test(argworld, argNumberofTest):
         test_simulation = simulation(argWorld=argworld, argSteplimit= STEP_LIMITS,
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="test",
-                                                           argVISUALIZATION=VISUALIZATION)
+                                                           argVISUALIZATION=VISUALIZATION
+                                     , argcommunication=COMMUNICATION)
         num_move, argworld, result, num_arrived, num_failed = test_simulation.run_one_simulation()
 
 
@@ -139,6 +146,8 @@ def centralized_train():
     new_world = world(argCreationMode=LOAD_CREATE)
     new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION,
                         argCentralized=True)
+    for i in new_world.agents:
+        i.set_total_agent_number(len(new_world.agents))
 
     training_score = []
 
@@ -164,7 +173,7 @@ def centralized_train():
             progress = 100*(i/NUM_SIMULATION)
             print(str(progress)+"% Completed")
             test_accuracy = centralized_test(argworld=new_world, argNumberofTest=NUM_TEST)
-        training_score.append([progress, test_accuracy])
+            training_score.append([progress, test_accuracy])
         # print("In training after the state of agent is "+new_world.agents[0].mode)
 
         if PRINT_SIMULATION_DETAILS:
@@ -181,7 +190,7 @@ def centralized_train():
     print("\nTotal number of completed simulations: "+str(simulation_counter))
     print("\n Final test for the model")
     final_test_accuracy=centralized_test(argworld=new_world, argNumberofTest=1)
-    new_world.saveWorld(argWorldName=WORLD_NAME)
+    new_world.saveWorld(argWorldName=WORLD_NAME, argCentralized=True, argMetaAgent=new_world.centralized_meta_agent)
     training_score.append([100,final_test_accuracy])
 
     return training_score
@@ -261,6 +270,7 @@ def save_results(final_results):
     file_1.close()
 
 if __name__ == '__main__':
+    starting_time = time.time()
     print("Epoches: "+str(EPOCHES))
     if MARL_MODE == "decentralized":
        accuracy = decentralized_train()
@@ -270,3 +280,7 @@ if __name__ == '__main__':
     save_results(accuracy)
     print("\nTotal progress :\n")
     print(accuracy)
+
+    end_time= time.time() - starting_time
+
+    print("\nTotal runtime:     \t{:.1f}".format(end_time) + " s")

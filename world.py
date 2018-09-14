@@ -186,6 +186,9 @@ class world():
         #self.check_player(argPlayer)
         if self.board[i-1][j]>99:
             argPlayer.state = "arrived"
+            index=self.find_goal(id=self.board[i-1][j])
+            self.goals[index].increment_agents()
+            argPlayer.arrived_at_goal = index + 1
         else:
             self.board[i-1][j]=argPlayer.id
         argPlayer.positionY =  argPlayer.positionY - 1
@@ -197,6 +200,9 @@ class world():
         #self.check_player(argPlayer)
         if self.board[i+1][j]>99:
             argPlayer.state="arrived"
+            index = self.find_goal(id=self.board[i + 1][j])
+            self.goals[index].increment_agents()
+            argPlayer.arrived_at_goal = index + 1
         else:
             self.board[i+1][j]=argPlayer.id
         argPlayer.positionY = argPlayer.positionY + 1
@@ -208,6 +214,9 @@ class world():
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
             argPlayer.state ="arrived"
+            index = self.find_goal(id=self.board[i][j+1])
+            self.goals[index].increment_agents()
+            argPlayer.arrived_at_goal = index+1
         else:
             self.board[i][j+1]=argPlayer.id
         argPlayer.positionX = argPlayer.positionX + 1
@@ -219,6 +228,9 @@ class world():
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
             argPlayer.state="arrived"
+            index = self.find_goal(id=self.board[i ][j- 1])
+            self.goals[index].increment_agents()
+            argPlayer.arrived_at_goal = index + 1
         else:
             self.board[i][j - 1] = argPlayer.id
         argPlayer.positionX = argPlayer.positionX - 1
@@ -228,6 +240,12 @@ class world():
     def find_object_index(self,object,list):
         for i in range(len(list)):
             if list[i].id == object.id:
+                return i
+
+    # a search function that returns the index of an object in a list
+    def find_goal(self, id):
+        for i in range(len(self.goals)):
+            if self.goals[i].id == id:
                 return i
 
     #check weather the created world matches specified information

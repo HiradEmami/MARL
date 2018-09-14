@@ -10,9 +10,6 @@ import random
 #if Randomized_move > 0 then appropriate number of random moves are included
 RANDOMIZED_MOVE = -4
 
-# TODO: I should add the halt move properly to the network and every other function
-# TODO: I should make the functions for performing the moves properly
-# TODO Agent needs one prefvious reward
 
 class agent():
     # An agent is initialized using:
@@ -53,9 +50,21 @@ class agent():
         self.reward_Sharing=False
         self.previous_reward=0
         self.pad_value=-5
-        self.target_goal = "not_decided"
+
+        self.target_goal = 0
+        self.communicate_target = None
+        self.communicate_goal_agents = None
+        self.total_agent= 0
+
+        self.arrived_at_goal = 0
+
+    def set_total_agent_number(self,argNum):
+        self.total_agent = argNum
 
 
+    def set_communication_lists(self,argTarget,argGoal_agents):
+        self.communicate_target = argTarget
+        self.communicate_goal_agents = argGoal_agents
 
     def load_networkd(self):
         self.NN.__del__()
@@ -75,6 +84,11 @@ class agent():
         self.positionY = self.default_positionY
         #set previous result to zero again
         self.previous_reward = 0
+        # communication reset
+        self.target_goal = 0
+        self.communicate_target = None
+        self.communicate_goal_agents = None
+        self.arrived_at_goal = 0
 
 
     # setter for the default values
@@ -115,11 +129,13 @@ class agent():
         self.communication = argCommunication
 
         if self.communication:
-            self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
+            self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2 + 2
+            self.output_size = 10
         else:
             self.input_size = (self.vision_x * self.vision_y *3)+ 2
+            self.output_size = 5
 
-        self.output_size=argOutputSize
+
         # defining the network
         if create_load_mode =="create":
             print("Creating the network for agent "+str(self.id)+": ")
@@ -318,7 +334,7 @@ class agent():
         reward = self.step_cost + additional_reward
         return reward
 
-    def perform_final_update(self,argreward):
+    def perform_final_update(self,argreward_1,argreward_2=0):
 
         # we first obtain our previous input layer by copying the input of NN
         previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
@@ -330,12 +346,22 @@ class agent():
         # Calculate actual reward
         # if we had to use rewardsharing we will get the additional reward that is provided
 
-        reward = argreward
+        reward_1 = argreward_1
+
+        if self.communication:
+            reward_2 = argreward_2
 
         #previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
-        previous_output_layer[self.previous_index] =  reward
+        if self.previous_index<5:
+         #print("reward 1:", reward_1)
+         previous_output_layer[self.previous_index] =  reward_1
+         self.previous_reward = reward_1
+        else:
+            #print("reward 2:", reward_2)
+            previous_output_layer[self.previous_index] = reward_2
+            self.previous_reward = reward_2
         # assigining the previous reward so that simulation uses that for reward sharing if needed
-        self.previous_reward = reward
+
 
         # Backpropagate actual reward
         # print("backprop", self.id)
@@ -350,19 +376,28 @@ class agent():
         # this returns two list :
         #  1) the options =(moves, score) eg, [('up',5),('left',4)]
         #  2) the scores =[network output value] eg, [5,4]
-        options_goal_1, scores_goal_1, options_goal_2, scores_goal_2 = self.get_move_options(argOutputlayer=network_rewards)
+        if self.communication:
+            options_goal_1, scores_goal_1, options_goal_2, scores_goal_2 = self.get_move_options(
+                argOutputlayer=network_rewards)
+        else:
+            options_goal_1, scores_goal_1, _ , _ = self.get_move_options(
+                argOutputlayer=network_rewards)
         # we call the function that finds the index, move and value given the options for the best move
         index_goal_1, move_goal_1, value_goal_1 =  self.get_max_value_move(argOptions=options_goal_1,argScores=scores_goal_1)
-        index_goal_2, move_goal_2, value_goal_2 = self.get_max_value_move(argOptions=options_goal_2, argScores=scores_goal_2)
-        index_goal_2 += 5
-        # returning the result for selecting the best move
-        if value_goal_1 > value_goal_2:
-            self.target_goal = 1
+        if not self.communication:
             return index_goal_1, value_goal_1, move_goal_1
-
         else:
-            self.target_goal = 2
-            return index_goal_2, value_goal_2, move_goal_2
+            #print(options_goal_2,scores_goal_2)
+            index_goal_2, move_goal_2, value_goal_2 = self.get_max_value_move(argOptions=options_goal_2, argScores=scores_goal_2)
+            index_goal_2 += 5
+            # returning the result for selecting the best move
+            if value_goal_1 > value_goal_2:
+                self.target_goal = 1
+                return index_goal_1, value_goal_1, move_goal_1
+
+            else:
+                self.target_goal = 2
+                return index_goal_2, value_goal_2, move_goal_2
 
 
     # Function that returns a list of confidence
@@ -381,14 +416,15 @@ class agent():
         # we loop through all the possible moves
         for i in self.possible_moves:
             move_index = self.move_to_index(argMove=i[2])
-            move_index_2 = self.move_to_index_second_goal(argMove=i[2])
             temp = (i[2], output[move_index])
             options_goal_1.append(temp)
             scores_goal_1.append(output[move_index])
 
-            temp2 = (i[2], output[move_index_2])
-            options_goal_2.append(temp)
-            scores_goal_2.append(output[move_index_2])
+            if self.communication:
+                move_index_2 = self.move_to_index_second_goal(argMove=i[2])
+                temp2 = (i[2], output[move_index_2])
+                options_goal_2.append(temp2)
+                scores_goal_2.append(output[move_index_2])
 
         return options_goal_1,scores_goal_1,options_goal_2,scores_goal_2
 
@@ -396,11 +432,29 @@ class agent():
     def get_max_value_move(self,argOptions, argScores):
         if len(self.possible_moves) == 0:
             print("NO Possible Move is Available")
-        max = np.max(argScores)
+        #print(argOptions,argScores)
+        max =self.get_max_of_list(argScores)
+        #print(max)
         for index in range(len(argOptions)):
+            #print(index)
             if argOptions[index][1] == max:
+                #print(argOptions[index][1])
                 # it returns the index of the item, the move and the value of the move
+                #print(index,argOptions[index][0], argOptions[index][1])
                 return index, argOptions[index][0], argOptions[index][1]
+        #return 0, argOptions[0][0] ,argOptions[0][1]
+
+    def get_max_of_list(self,list):
+        #print(list, len(list))
+        if len(list) == 1:
+            return list[0]
+        else:
+            max = list[0]
+            for i in list:
+                if max < i:
+                    max = i
+            #print(max)
+            return max
 
     def get_random_move(self):
         randomChoice = random.choice(self.possible_moves)
@@ -533,9 +587,9 @@ class agent():
             acceptable.append(halt_move)
 
         # returning the acceptable and rejected moves
-        if not (len(acceptable)+len(rejected)==self.output_size):
-            print("ERROR! the sum of accepted and rejected are bigger than output layer size:\n")
-            print("Output_layer: "+str(self.output_size)+" ,accepted: "+str(len(acceptable))+" ,rejected: "+str(len(rejected)))
+        #if not (len(acceptable)+len(rejected)==self.output_size):
+        #    print("ERROR! the sum of accepted and rejected are bigger than output layer size:\n")
+        #    print("Output_layer: "+str(self.output_size)+" ,accepted: "+str(len(acceptable))+" ,rejected: "+str(len(rejected)))
         return acceptable, rejected
 
 
@@ -590,7 +644,7 @@ class agent():
         else:
             # If we had communication between agents we have to add two nods to the input layer
             if self.communication:
-                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+ 2 + 2
+                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+ 2 + 2 + 2
             else:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
 
@@ -613,8 +667,21 @@ class agent():
             result_list.append(node_y)
 
             if self.communication:
-                result_list.append(0.2)
-                result_list.append(0.5)
+                goal_1 = self.scale(argNum=self.communicate_goal_agents[0],argMax=self.total_agent,argMin=0,
+                                    scale_max=1,scale_min=0)
+                goal_2 = self.scale(argNum=self.communicate_goal_agents[1], argMax=self.total_agent, argMin=0,
+                                    scale_max=1, scale_min=0)
+                result_list.append(goal_1)
+                result_list.append(goal_2)
+
+                target_1 = self.scale(argNum=self.communicate_target[0],argMax=self.total_agent,argMin=0,
+                                    scale_max=1,scale_min=0)
+                target_2 = self.scale(argNum=self.communicate_target[1], argMax=self.total_agent, argMin=0,
+                                    scale_max=1, scale_min=0)
+                #print(self.communicate_goal_agents[0],self.communicate_goal_agents[1],
+                     # self.communicate_target[1],self.communicate_target[1])
+                result_list.append(target_1)
+                result_list.append(target_2)
             else:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
 
