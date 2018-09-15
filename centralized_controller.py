@@ -90,6 +90,15 @@ class controller():
         self.previous_input_layer = None
 
         # the function for selecting the next action
+    def reset_meta_agent(self):
+        # reseting the number of moves
+        self.move_count = 0
+        # setting back the state of the agent
+        self.state = "initialized"
+        # setting the location of the agents back to default values
+        #set previous result to zero again
+        self.previous_reward = 0
+
 
     def make_decision(self, argWGrid, argAgent,argAdditionalReward=None):
         # The portion of the grid that is observed by the agent currently, will be passed as argWGrid

@@ -221,8 +221,10 @@ def centralized_test(argworld, argNumberofTest):
         total_num_failed += num_failed
         if result == "successful":
             successful += 1
+            #print("success")
         else:
             failed += 1
+            #print("fail")
     accuracy = (successful / argNumberofTest) * 100.0
     if PRINT_TEST_DETAILS:
         print("\n" + str(argNumberofTest) + " Completed!\nTotal successful simulations: "

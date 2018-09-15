@@ -46,6 +46,7 @@ class centralized_simulation():
         for i in range(len(self.world.agents)):
             self.world.agents[i].reset_agent()
 
+        self.world.centralized_meta_agent.reset_meta_agent()
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
 
@@ -81,6 +82,7 @@ class centralized_simulation():
                 if self.print_details:
                     print("All agents arrived to their destination")
                     print("Number of remaining Agents: " + str(remain))
+
                 simulation_state = "finished"
 
             else:
@@ -117,13 +119,9 @@ class centralized_simulation():
             # updating the reward
             if i.state == "arrived":
                 num_arrived += 1
-                if self.mode == "train":
-                    self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
                 reward.append(WIN_REWARD)
             else:
                 num_failed += 1
-                if self.mode == "train":
-                    self.world.centralized_meta_agent.perform_final_update(argreward=LOSE_REWARD)
                 reward.append(LOSE_REWARD)
 
         # result can be success or fail
@@ -131,9 +129,13 @@ class centralized_simulation():
 
         if num_arrived == len(reward):
             result = "successful"
+            if self.mode == "train":
+                self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
 
         else:
             result = "fail"
+            if self.mode == "train":
+                self.world.centralized_meta_agent.perform_final_update(argreward=LOSE_REWARD)
 
         return result, num_arrived, num_failed
 
