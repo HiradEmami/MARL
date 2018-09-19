@@ -5,7 +5,7 @@ from system_utility import *
 from simulation import  *
 
 NUMBER_OF_AGENTS = 8
-WORLD_NAME = 'test_centralized'
+WORLD_NAME = 'D_Simple_'
 
 REWARD_SHARING = False
 COMMUNICATION = False
@@ -20,13 +20,16 @@ OUT_SIZE = 5
 
 RANDOMIZATION_TEST = False
 
+WORLD_NAME +=str(LEARNING_RATE)+"_"+str(DISCOUNT)+"_"+str(EXPLORATION)+"_"+str(HIDDEN_SIZE)+ \
+    ("T" if COMMUNICATION else "F")+"_"+str("T" if REWARD_SHARING else "F")
+
 class worldGenrator():
     def __init__(self):
         self.obstacles = []
         self.agents = []
         self.goals = []
-        self.width=10
-        self.height = 15
+        self.width=20
+        self.height = 20
 
         self.world = self.generate()
 
@@ -36,11 +39,15 @@ class worldGenrator():
         # creating Obstacles
         new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
         new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=2, argX=6, argY=7)
+        new_obstacle_3 = obstacle(argType='wall', argId=-3, argWidth=2, argHight=1, argX=16, argY=7)
+        new_obstacle_4 = obstacle(argType='wall', argId=-4, argWidth=3, argHight=2, argX=10, argY=17)
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
+        self.obstacles.append(new_obstacle_3)
+        self.obstacles.append(new_obstacle_4)
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=0,argY=0)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=3,argWidth=1,argX=9,argY=11)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=2,argWidth=2,argX=0,argY=0)
+        new_goal_2 = goal(argColor='green',argId=101,argHight=3,argWidth=3,argX=9,argY=11)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
@@ -48,27 +55,23 @@ class worldGenrator():
         for i in range(1,num_agents+1):
             # creating the agent
             new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
+
+            # creating the network of the agent
+            new_agent.create_brain(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
+                                   argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
+                                   argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
+                                   argRewardSharing=REWARD_SHARING,create_load_mode="create",
+                                   argCommunication=COMMUNICATION)
+
+            new_agent.set_network_folder(WORLD_NAME)
+
+            new_agent.save_network()
             # add the agent to the list
             self.agents.append(new_agent)
-
-        # create the meta agent
-        meta_centralized_agent = controller()
-        # creating the network of the Meta agent
-        meta_centralized_agent.build_network(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
-                               argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
-                               argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
-                               argRewardSharing=REWARD_SHARING,create_load_mode="create"
-                                             ,argboard_width=self.width, argboard_height=self.height)
-
-        meta_centralized_agent.set_network_folder(WORLD_NAME)
-
-        meta_centralized_agent.save_network()
 
         self.world = world(argCreationMode="create",worldName=self.name)
 
         self.world.createWorld(argWidth=self.width,argHeigth=self.height, argObstacleList=self.obstacles, goalList=self.goals, argAgentList=self.agents)
-
-        self.world.set_meta_controller_agent(argMetaController=meta_centralized_agent)
 
         print(self.world.board)
         print(len(self.world.goals))
@@ -76,11 +79,12 @@ class worldGenrator():
         print(len(self.world.obstacles))
         self.world.check_validity()
 
-        self.world.saveWorld(argWorldName=self.name,argCentralized=True,argMetaAgent=self.world.centralized_meta_agent)
+        self.world.saveWorld(argWorldName=self.name)
+
 
         #testing the world
-
-        self.world.centralized_meta_agent.NN.__del__()
+        for i in self.world.agents:
+            i.NN.__del__()
         new_world = world(argCreationMode="load")
         if RANDOMIZATION_TEST:
             print("\n##########################")
@@ -98,8 +102,7 @@ class worldGenrator():
             print(self.world.board)
 
 
-        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION
-                            ,argCentralized=True)
+        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
         for i in new_world.agents:
             print(i.default_positionX,i.default_positionY)
         new_world.print_the_world()

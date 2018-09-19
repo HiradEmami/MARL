@@ -11,7 +11,7 @@ import random
 RANDOMIZED_MOVE = -4
 
 
-class agent():
+class Policy_agent():
     # An agent is initialized using:
     #   1)   An integer "id"
     #   2)   The Extent of it's vision = (argVisionY, argVisionX)  #The default value is set at 5
@@ -117,7 +117,7 @@ class agent():
 
     # The Create_brain function creates the primary neural netwokr that the agent is using the given
     # parameters. The function is called after creation of the agent
-    def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation,
+    def shared_create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation,
                      argOut_activation,argOutputSize = 10,create_load_mode = "create",
                      argRewardSharing = False, argCommunication = False):
         # the primary neural network
@@ -252,9 +252,21 @@ class agent():
         return new_board
 
     # the function for selecting the next action
-    def make_decision(self,argWGrid,argAdditionalReward=None):
+    def shared_make_decision(self,argWGrid,argAgent,argAdditionalReward=None):
         # The portion of the grid that is observed by the agent currently, will be passed as argWGrid
         # This matrix is flattened to be used as the input layer of the Q-learning network
+        self.id = argAgent.id
+        self.positionX = argAgent.positionX
+        self.positionY = argAgent.positionY
+
+        self.target_goal =  argAgent.target_goal
+        self.communicate_target = argAgent.communicate_target
+        self.communicate_goal_agents =  argAgent.communicate_goal_agents
+        self.total_agent = argAgent.total_agent
+
+        self.arrived_at_goal = argAgent.arrived_at_goal
+        self.previous_goal = argAgent.previous_goal
+
         observabl_grid = self.get_observable_board(argBoard=argWGrid)
         obstacle_board = self.get_obstacle_grid(argGrid=observabl_grid)
         agent_board= self.get_agent_grid(argGrid=observabl_grid)
@@ -304,7 +316,7 @@ class agent():
             self.previous_reward = reward
 
             # Backpropagate actual reward
-            #print("backprop", self.id)
+            # print("backprop", self.id)
             self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
         else:
             self.state = "Progressing"
@@ -336,14 +348,17 @@ class agent():
         self.previous_index = index
         self.move_count += 1
 
-        return move, self.confidence
+        new_info = [ self.target_goal ,self.communicate_target,self.communicate_goal_agents,self.total_agent,
+                     self.arrived_at_goal,self.previous_goal]
+
+        return move, self.confidence, new_info
 
     def get_reward(self,additional_reward=0):
         reward = self.step_cost + additional_reward
         return reward
 
     def perform_final_update(self,argreward_1,argreward_2=0):
-        #print("final Update")
+
         # we first obtain our previous input layer by copying the input of NN
         previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
         previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)

@@ -4,8 +4,8 @@ from world import *
 from system_utility import *
 from simulation import  *
 
-NUMBER_OF_AGENTS = 8
-WORLD_NAME = 'test_centralized'
+NUMBER_OF_AGENTS = 4
+WORLD_NAME = "C_Simple_"
 
 REWARD_SHARING = False
 COMMUNICATION = False
@@ -19,6 +19,9 @@ HIDDEN_SIZE = 50
 OUT_SIZE = 5
 
 RANDOMIZATION_TEST = False
+
+WORLD_NAME +=str(LEARNING_RATE)+"_"+str(DISCOUNT)+"_"+str(EXPLORATION)+"_"+str(HIDDEN_SIZE)+ \
+    ("T" if COMMUNICATION else "F")+"_"+str("T" if REWARD_SHARING else "F")
 
 class worldGenrator():
     def __init__(self):

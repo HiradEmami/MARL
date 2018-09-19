@@ -12,7 +12,8 @@ from learner import *
 #global variables
 primaryDirectory='Saved_Worlds'
 
-def save_world(argWorldName,board, obstacles, agents, goals, width, height, argCentralized=False,argMetaAgent = None):
+def save_world(argWorldName,board, obstacles, agents, goals, width, height, argCentralized=False,argMetaAgent = None,
+               argSharedPolicy = False, argSharedBrain=None):
 #The primary Directory for worlds is a folder called Saved_worlds
 
         #The output folder to save all the information of the world is saved as:
@@ -40,7 +41,10 @@ def save_world(argWorldName,board, obstacles, agents, goals, width, height, argC
         if argCentralized:
             save_network_structure(outputDirect=outputDirect,argAgent=argMetaAgent)
         else:
-            save_network_structure(outputDirect=outputDirect,argAgent=agents[0])
+            if not argSharedPolicy:
+                save_network_structure(outputDirect=outputDirect, argAgent=agents[0])
+            else:
+                save_network_structure(outputDirect=outputDirect, argAgent=argSharedBrain)
 
 
 #the save function that specifically saves the world, this function is also used for visualization

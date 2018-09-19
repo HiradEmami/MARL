@@ -18,6 +18,7 @@ from tkinter import *
 from worldObject import *
 from centralized_controller import *
 import copy
+import shared_policy_brain as sharedpolicy
 
 #Global
 SCALE_BETWEEN_MIN = 0
@@ -36,7 +37,7 @@ class world():
         self.name = worldName
 
     #Function to load the entire world
-    def loadWolrd(self,argName,argRewardSharing, argCommunication,argCentralized=False):
+    def loadWolrd(self,argName,argRewardSharing, argCommunication,argCentralized=False,argSharedPolicy=False):
 
         print("\n#######################")
         print("Loading the World : "+str(argName))
@@ -67,13 +68,23 @@ class world():
             print("\nLoading Network Structures ...")
             print("hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount")
             print(hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount)
-
-            for i in self.agents:
-                i.set_network_folder(self.name)
-                i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
-                               argHidden_size=hidden_size,argHidden_activation=hidden_activation,
+            if not argSharedPolicy:
+                for i in self.agents:
+                    i.set_network_folder(self.name)
+                    i.create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
+                                   argHidden_size=hidden_size,argHidden_activation=hidden_activation,
+                                   argOut_activation='linear', argOutputSize=output_size,
+                                   argRewardSharing=argRewardSharing,create_load_mode="load",
+                                   argCommunication=argCommunication)
+            else:
+                self.shared_policy_brain = sharedpolicy.Policy_agent(argId=12, argVisionX=3, argVisionY=3)
+                self.shared_policy_brain.set_scale_parameters(argBoardWidth=self.width, argBoardHeight=self.height,
+                                       argScaleMin=SCALE_BETWEEN_MIN, argScaleMax=SCALE_BETWEEN_MAX)
+                self.shared_policy_brain.set_network_folder(self.name)
+                self.shared_policy_brain.shared_create_brain(argExploration=exploration, argDiscount=discount, argLearning_rate=learning_rate,
+                               argHidden_size=hidden_size, argHidden_activation=hidden_activation,
                                argOut_activation='linear', argOutputSize=output_size,
-                               argRewardSharing=argRewardSharing,create_load_mode="load",
+                               argRewardSharing=argRewardSharing, create_load_mode="load",
                                argCommunication=argCommunication)
         else:
             print("\nLoading The Centralized Meta Agent\n")
@@ -113,10 +124,12 @@ class world():
 
         print("\ntest completed:\n")
 
-    def saveWorld(self,argWorldName,argCentralized=False,argMetaAgent=None):
+    def saveWorld(self,argWorldName,argCentralized=False,argMetaAgent=None,argShared_policy=False):
         save_world(argWorldName,width=self.width,height=self.height,goals=self.goals,agents=self.agents,
                    obstacles=self.obstacles,board=self.board,
-                   argCentralized=argCentralized,argMetaAgent=argMetaAgent)
+                   argCentralized=argCentralized,argMetaAgent=argMetaAgent,
+                   argSharedPolicy=argShared_policy,
+                   argSharedBrain= (self.shared_policy_brain if argShared_policy else None))
 
 
 
@@ -141,8 +154,12 @@ class world():
         #taking a copy of the world
         self.default_board = copy.copy(self.board)
 
+
     def set_meta_controller_agent(self,argMetaController):
         self.centralized_meta_agent = argMetaController
+
+    def set_shared_policy_brain(self,argSharedBrain):
+        self.shared_policy_brain = argSharedBrain
 
 
     def place_agents(self,argMargine_constraint=True):
@@ -177,63 +194,100 @@ class world():
                     i.positionY = temp_positionY
                     foundLocation = True
 
+
     def move_up(self,argPlayer):
+        rejected_move = False
         # print("up")
         i,j=self.search_for_object(argPlayer)
-        self.board[i][j]=0
-        self.board[i][j]=0
+        self.board[i][j] = 0
         #if it the tile is a goal change the state of the state to arrived
         #self.check_player(argPlayer)
         if self.board[i-1][j]>99:
-            argPlayer.state = "arrived"
-            index=self.find_goal(id=self.board[i-1][j])
-            self.goals[index].increment_agents()
-            argPlayer.arrived_at_goal = index + 1
+            index = self.find_goal(id=self.board[i - 1][j])
+            if not self.goals[index].num_agent == self.goals[index].capacity:
+                self.goals[index].increment_agents()
+                argPlayer.arrived_at_goal = index + 1
+                argPlayer.state = "arrived"
+                rejected_move = False
+            else:
+                rejected_move = True
         else:
             self.board[i-1][j]=argPlayer.id
-        argPlayer.positionY =  argPlayer.positionY - 1
+        if not rejected_move:
+            argPlayer.positionY =  argPlayer.positionY - 1
+        else:
+            self.board[i][j] = argPlayer.id
+
     def move_down(self,argPlayer):
+        rejected_move = False
         # print("down")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
         # if it the tile is a goal change the state of the state to arrived
         #self.check_player(argPlayer)
         if self.board[i+1][j]>99:
-            argPlayer.state="arrived"
             index = self.find_goal(id=self.board[i + 1][j])
-            self.goals[index].increment_agents()
-            argPlayer.arrived_at_goal = index + 1
+            if not self.goals[index].num_agent == self.goals[index].capacity:
+                argPlayer.state = "arrived"
+                self.goals[index].increment_agents()
+                argPlayer.arrived_at_goal = index + 1
+                rejected_move = False
+            else:
+                rejected_move = True
         else:
             self.board[i+1][j]=argPlayer.id
-        argPlayer.positionY = argPlayer.positionY + 1
+        if not rejected_move:
+            argPlayer.positionY = argPlayer.positionY + 1
+        else:
+            self.board[i][j] = argPlayer.id
     def move_right(self,argPlayer):
+        rejected_move = False
         # print("right")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
        # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
-            argPlayer.state ="arrived"
             index = self.find_goal(id=self.board[i][j+1])
-            self.goals[index].increment_agents()
-            argPlayer.arrived_at_goal = index+1
+            if not self.goals[index].num_agent == self.goals[index].capacity:
+                argPlayer.state = "arrived"
+                self.goals[index].increment_agents()
+                argPlayer.arrived_at_goal = index+1
+                rejected_move = False
+            else:
+                rejected_move = True
         else:
             self.board[i][j+1]=argPlayer.id
-        argPlayer.positionX = argPlayer.positionX + 1
+        if not rejected_move:
+            argPlayer.positionX = argPlayer.positionX + 1
+        else:
+            self.board[i][j] = argPlayer.id
     def move_left(self,argPlayer):
+        rejected_move = False
         # print("left")
         i,j=self.search_for_object(argPlayer)
         self.board[i][j]=0
        # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
-            argPlayer.state="arrived"
             index = self.find_goal(id=self.board[i ][j- 1])
-            self.goals[index].increment_agents()
-            argPlayer.arrived_at_goal = index + 1
+            if not self.goals[index].num_agent == self.goals[index].capacity:
+                argPlayer.state = "arrived"
+                self.goals[index].increment_agents()
+                argPlayer.arrived_at_goal = index + 1
+                rejected_move = False
+            else:
+                rejected_move = True
         else:
             self.board[i][j - 1] = argPlayer.id
-        argPlayer.positionX = argPlayer.positionX - 1
+
+        if not rejected_move:
+            argPlayer.positionX = argPlayer.positionX - 1
+        else:
+            self.board[i][j] = argPlayer.id
+
+
+
 
 
     #a search function that returns the index of an object in a list

@@ -17,11 +17,11 @@ import time
 #       Input of Variables       #
 ################################
 LOAD_CREATE = "load"
-#WORLD_NAME="test"
-WORLD_NAME = 'test_centralized'
+WORLD_NAME="test"
+#WORLD_NAME = 'test_centralized'
 TRAINING_TESTING = "training"
-#MARL_MODE = "decentralized"
-MARL_MODE = "centralized"
+MARL_MODE = "decentralized"
+#MARL_MODE = "centralized"
 
 # Would save the world after training
 SAVE_THE_SESSION = False
@@ -29,6 +29,7 @@ VISUALIZATION = False
 
 COMMUNICATION = False
 REWARD_SHARING = False
+SHARED_POLICY = False
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
@@ -49,7 +50,8 @@ def decentralized_train():
     print("\nStarting Decentralized System:\n")
     # Loading the world and the agents
     new_world = world(argCreationMode=LOAD_CREATE)
-    new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION)
+    new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION,
+                        argSharedPolicy=SHARED_POLICY)
     training_score = []
 
     for i in new_world.agents:
@@ -67,10 +69,12 @@ def decentralized_train():
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train"
                                         ,argVISUALIZATION=VISUALIZATION
-                                        ,argcommunication=COMMUNICATION)
+                                        ,argcommunication=COMMUNICATION
+                                        ,argSharedPolicy=SHARED_POLICY)
+
         # getting some of the information back
         num_move, new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
-
+        print(num_move)
 
         # print("In training the state of agent is " + new_world.agents[0].mode)
         if (i % EPOCHES)==0 and not i==0:
@@ -118,7 +122,8 @@ def decentralized_test(argworld, argNumberofTest):
                                   argDeveloperMode=DEVELOPER_MODE,argrewardSharing=REWARD_SHARING,
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="test",
                                                            argVISUALIZATION=VISUALIZATION
-                                     , argcommunication=COMMUNICATION)
+                                     , argcommunication=COMMUNICATION,
+                                     argSharedPolicy=SHARED_POLICY)
         num_move, argworld, result, num_arrived, num_failed = test_simulation.run_one_simulation()
 
 

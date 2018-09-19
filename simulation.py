@@ -2,6 +2,7 @@ from learner import *
 from world import *
 from worldObject import *
 from copy import copy
+from shared_policy_brain import *
 from pip._vendor.distlib.compat import raw_input
 # TODO: self.PrepareCommunication should check if it is true, if so for all agents use the function to set communication
 
@@ -13,7 +14,7 @@ RANDOMIZATION = True
 
 class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,
-                 argMode="train",argVISUALIZATION=False,argcommunication = False):
+                 argMode="train",argVISUALIZATION=False,argcommunication = False,argSharedPolicy=False):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
@@ -27,6 +28,7 @@ class simulation():
         self.mode = argMode
         self.visualization=argVISUALIZATION
         self.communication = argcommunication
+        self.shared_policy = argSharedPolicy
 
 
     #function to reset the grid and reset player information
@@ -107,7 +109,10 @@ class simulation():
             print("Resetting simulation!")
 
         #evaluate the performance
-        result, num_arrived, num_failed = self.evaluate_performance()
+        if not self.shared_policy:
+            result, num_arrived, num_failed = self.evaluate_performance()
+        else:
+            result, num_arrived, num_failed = self.evaluate_performance_shared_policy()
         # Once the simulation is over, call to reset the world and agents
         self.reset_settings()
 
@@ -155,6 +160,52 @@ class simulation():
 
 
         return result, num_arrived , num_failed
+
+    def evaluate_performance_shared_policy(self):
+        num_failed=0
+        num_arrived =0
+        reward = []
+        added_reward_1 = 0
+        added_reward_2 = 0
+        for i in self.world.agents:
+            #updating the reward
+            if i.state == "arrived":
+                num_arrived +=1
+                if self.mode == "train":
+                    if self.communication:
+                        if i.arrived_at_goal == 1:
+                            added_reward_1 += 0.1
+                        elif i.arrived_at_goal == 2:
+                            added_reward_2 += 0.1
+                reward.append(WIN_REWARD)
+            else:
+                num_failed +=1
+                added_reward_1 -= 0.1
+                added_reward_2 -= 0.1
+                reward.append(LOSE_REWARD)
+
+        # result can be success or fail
+        result = None
+
+        if num_arrived == len(reward):
+            result = "successful"
+            if self.mode == "train":
+                if not self.communication:
+                    self.world.shared_policy_brain.perform_final_update(argreward_1=WIN_REWARD)
+                else:
+                    self.world.shared_policy_brain.perform_final_update(argreward_1=WIN_REWARD+added_reward_1,
+                                                                        argreward_2=WIN_REWARD+added_reward_2)
+        else:
+            result = "fail"
+            if self.mode == "train":
+                if not self.communication:
+                    self.world.shared_policy_brain.perform_final_update(argreward_1=LOSE_REWARD)
+                else:
+                    self.world.shared_policy_brain.perform_final_update(argreward_1=LOSE_REWARD+added_reward_1,
+                                                                        argreward_2=LOSE_REWARD+added_reward_2)
+
+
+        return result, num_arrived , num_failed
         
 
     # Function that connects the decision that agents make to the functions of performing and executing the actions
@@ -182,6 +233,15 @@ class simulation():
         if self.developerMode:
             self.world.saveWorld('test')
 
+    def shared_update_agent_info(self,mainAgent, info):
+        mainAgent.target_goal=info[0]
+        mainAgent.communicate_target=info[1]
+        mainAgent.communicate_goal_agents=info[2]
+        mainAgent.total_agent=info[3]
+        mainAgent.arrived_at_goal=info[4]
+        mainAgent.previous_goal=info[5]
+        return mainAgent
+
     # Function that makes all the agents that are not arrived to perform one action
     def do_one_step(self):
         self.prepare_communication()
@@ -190,7 +250,12 @@ class simulation():
             for i in self.world.agents:
                 if not  (i.state=="arrived"):
                     additional_reward= self.get_additional_reward(i.id)
-                    move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    if not self.shared_policy:
+                        move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    else:
+                        move, confidence, new_info = self.world.shared_policy_brain.shared_make_decision(argWGrid=self.world.board,
+                                                           argAdditionalReward=additional_reward,argAgent=i)
+                        i = self.shared_update_agent_info(mainAgent=i,info=new_info)
                     self.perform_move(argAgent=i,argMove=move)
 
         elif (self.rewardSharing) and (self.first_move):
@@ -198,14 +263,24 @@ class simulation():
             for i in self.world.agents:
                  if not (i.state == "arrived"):
                     additional_reward =0
-                    move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    if not self.shared_policy:
+                        move, confidence = i.make_decision(argWGrid=self.world.board,argAdditionalReward=additional_reward)
+                    else:
+                        move, confidence, new_info = self.world.shared_policy_brain.shared_make_decision(argWGrid=self.world.board,
+                                                           argAdditionalReward=additional_reward,argAgent=i)
+                        i = self.shared_update_agent_info(mainAgent=i,info=new_info)
                     self.perform_move(argAgent=i, argMove=move)
         else:
             for i in self.world.agents:
-                 if not (i.state == "arrived"):
-                    move, confidence = i.make_decision(argWGrid=self.world.board)
+                if not (i.state == "arrived"):
+                    if not self.shared_policy:
+                        move, confidence = i.make_decision(argWGrid=self.world.board)
+                    else:
+                        move, confidence, new_info = self.world.shared_policy_brain.shared_make_decision(
+                            argWGrid=self.world.board,
+                            argAgent=i)
+                        i = self.shared_update_agent_info(mainAgent=i, info=new_info)
                     #continue_key = float(raw_input("Enter 1 to continue:"))
-
                     self.perform_move(argAgent=i, argMove=move)
                     #print(move, i.positionX, i.positionY )
 
