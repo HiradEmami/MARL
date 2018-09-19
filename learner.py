@@ -304,7 +304,7 @@ class agent():
             self.previous_reward = reward
 
             # Backpropagate actual reward
-            #print("backprop", self.id)
+            #print("backprop for agent " +str(self.id))
             self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
         else:
             self.state = "Progressing"
@@ -343,7 +343,7 @@ class agent():
         return reward
 
     def perform_final_update(self,argreward_1,argreward_2=0):
-        #print("final Update")
+        #print("final Update for agent " +str(self.id))
         # we first obtain our previous input layer by copying the input of NN
         previous_input_layer = copy.copy(self.NN.input_layer)  # previous state (s0)
         previous_output_layer = copy.copy(self.NN.output_layer)  # previous expected reward (r1)

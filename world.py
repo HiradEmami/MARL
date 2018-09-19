@@ -24,6 +24,7 @@ import shared_policy_brain as sharedpolicy
 SCALE_BETWEEN_MIN = 0
 SCALE_BETWEEN_MAX = 2
 RAND=-1
+M_RES = False
 
 class world():
 
@@ -204,10 +205,11 @@ class world():
         #self.check_player(argPlayer)
         if self.board[i-1][j]>99:
             index = self.find_goal(id=self.board[i - 1][j])
-            if not self.goals[index].num_agent == self.goals[index].capacity:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
                 self.goals[index].increment_agents()
                 argPlayer.arrived_at_goal = index + 1
                 argPlayer.state = "arrived"
+                #print("agent " + str(argPlayer.id) + " arrived at goal" + str(index + 1))
                 rejected_move = False
             else:
                 rejected_move = True
@@ -227,8 +229,9 @@ class world():
         #self.check_player(argPlayer)
         if self.board[i+1][j]>99:
             index = self.find_goal(id=self.board[i + 1][j])
-            if not self.goals[index].num_agent == self.goals[index].capacity:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
                 argPlayer.state = "arrived"
+                #print("agent " + str(argPlayer.id) + " arrived at goal" + str(index + 1))
                 self.goals[index].increment_agents()
                 argPlayer.arrived_at_goal = index + 1
                 rejected_move = False
@@ -249,8 +252,9 @@ class world():
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
             index = self.find_goal(id=self.board[i][j+1])
-            if not self.goals[index].num_agent == self.goals[index].capacity:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
                 argPlayer.state = "arrived"
+                #print("agent " + str(argPlayer.id) + " arrived at goal" + str(index + 1))
                 self.goals[index].increment_agents()
                 argPlayer.arrived_at_goal = index+1
                 rejected_move = False
@@ -271,8 +275,9 @@ class world():
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
             index = self.find_goal(id=self.board[i ][j- 1])
-            if not self.goals[index].num_agent == self.goals[index].capacity:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
                 argPlayer.state = "arrived"
+                #print("agent "+str(argPlayer.id)+" arrived at goal"+str(index+1))
                 self.goals[index].increment_agents()
                 argPlayer.arrived_at_goal = index + 1
                 rejected_move = False

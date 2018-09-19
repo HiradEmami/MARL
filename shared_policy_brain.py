@@ -253,6 +253,7 @@ class Policy_agent():
 
     # the function for selecting the next action
     def shared_make_decision(self,argWGrid,argAgent,argAdditionalReward=None):
+
         # The portion of the grid that is observed by the agent currently, will be passed as argWGrid
         # This matrix is flattened to be used as the input layer of the Q-learning network
         self.id = argAgent.id

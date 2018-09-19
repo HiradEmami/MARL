@@ -4,7 +4,7 @@ from world import *
 from system_utility import *
 from simulation import  *
 from shared_policy_brain import  *
-NUMBER_OF_AGENTS = 4
+NUMBER_OF_AGENTS = 6
 WORLD_NAME = 'test'
 
 VISION_X = 3
@@ -66,6 +66,7 @@ class worldGenrator():
             self.agents.append(new_agent)
 
         if SHARED_POLICY:
+
             shared_brain = Policy_agent(argId=12, argVisionX=3, argVisionY=3)
 
             # creating the network of the agent

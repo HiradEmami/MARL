@@ -27,7 +27,7 @@ MARL_MODE = "decentralized"
 SAVE_THE_SESSION = False
 VISUALIZATION = False
 
-COMMUNICATION = False
+COMMUNICATION = True
 REWARD_SHARING = False
 SHARED_POLICY = False
 
@@ -73,8 +73,8 @@ def decentralized_train():
                                         ,argSharedPolicy=SHARED_POLICY)
 
         # getting some of the information back
-        num_move, new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
-        print(num_move)
+        _ , new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
+
 
         # print("In training the state of agent is " + new_world.agents[0].mode)
         if (i % EPOCHES)==0 and not i==0:
@@ -86,7 +86,7 @@ def decentralized_train():
         # print("In training after the state of agent is "+new_world.agents[0].mode)
 
         if PRINT_SIMULATION_DETAILS:
-            print("Finished", num_move , num_arrived ,num_failed , result)
+            print("Finished", num_arrived ,num_failed , result)
 
 
     if SAVE_THE_SESSION:
