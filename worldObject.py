@@ -19,8 +19,7 @@ class goal():
         self.y = argY
         self.id = argId
         self.num_agent = 0
-        self.capacity = self.width * self.height
-
+        self.capacity =( self.width * self.height )
     def set_new_position(self,argX,argY):
         self.x= argX
         self.y = argY

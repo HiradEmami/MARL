@@ -28,14 +28,14 @@ SAVE_THE_SESSION = False
 VISUALIZATION = False
 
 COMMUNICATION = True
-REWARD_SHARING = False
+REWARD_SHARING = True
 SHARED_POLICY = False
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = True
 
-NUM_SIMULATION = 3000
+NUM_SIMULATION = 20000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
 

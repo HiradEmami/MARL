@@ -46,6 +46,9 @@ class centralized_simulation():
         for i in range(len(self.world.agents)):
             self.world.agents[i].reset_agent()
 
+        for j in range(len(self.world.goals)):
+            self.world.goals[j].reset_goal()
+
         self.world.centralized_meta_agent.reset_meta_agent()
         # placeholder to indicate if it is the first move that agents are taking
         self.first_move = True
@@ -59,10 +62,10 @@ class centralized_simulation():
 
         num_steps = 0
         simulation_state = "running_simulation"
-
+        self.world.test_randomization_prepration()
         end_statement = "failed"
-        if self.mode == "test":
-            self.world.test_randomization_prepration()
+        #if self.mode == "test":
+            #self.world.test_randomization_prepration()
         while not (simulation_state == "finished"):
 
             remain = self.number_remaining_agents()
@@ -114,15 +117,20 @@ class centralized_simulation():
         num_failed = 0
         num_arrived = 0
         reward = []
+        addedReward = 0
 
         for i in self.world.agents:
             # updating the reward
             if i.state == "arrived":
                 num_arrived += 1
+                addedReward += 0.2
                 reward.append(WIN_REWARD)
+                #self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
             else:
                 num_failed += 1
+                addedReward -= 0.2
                 reward.append(LOSE_REWARD)
+                #self.world.centralized_meta_agent.perform_final_update(argreward=LOSE_REWARD)
 
         # result can be success or fail
         result = None
@@ -175,6 +183,8 @@ class centralized_simulation():
                                                                                        argAgent=i,
                                                                                 argAdditionalReward=additional_reward)
                     self.perform_move(argAgent=i, argMove=move)
+                    if i.state == "arrived":
+                        self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
 
         elif (self.rewardSharing) and (self.first_move):
             self.first_move = False

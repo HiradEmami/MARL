@@ -24,7 +24,7 @@ import shared_policy_brain as sharedpolicy
 SCALE_BETWEEN_MIN = 0
 SCALE_BETWEEN_MAX = 2
 RAND=-1
-M_RES = False
+M_RES = True
 
 class world():
 
@@ -45,6 +45,7 @@ class world():
         print("#######################\n")
 
         # Getting the following information from the saved files
+        self.M_res = M_RES
         self.board, self.width, self.height, self.agents, self.obstacles, self.goals,self.name = load_world(argName)
 
         print("World name: " + self.name)
@@ -154,6 +155,7 @@ class world():
         self.place_agents(argMargine_constraint=argAgent_Location_Constraint)
         #taking a copy of the world
         self.default_board = copy.copy(self.board)
+        self.M_res = M_RES
 
 
     def set_meta_controller_agent(self,argMetaController):
@@ -199,13 +201,15 @@ class world():
     def move_up(self,argPlayer):
         rejected_move = False
         # print("up")
-        i,j=self.search_for_object(argPlayer)
+        #i,j=self.search_for_object(argPlayer)
+        i=argPlayer.positionY
+        j=argPlayer.positionX
         self.board[i][j] = 0
         #if it the tile is a goal change the state of the state to arrived
         #self.check_player(argPlayer)
         if self.board[i-1][j]>99:
             index = self.find_goal(id=self.board[i - 1][j])
-            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not self.M_res:
                 self.goals[index].increment_agents()
                 argPlayer.arrived_at_goal = index + 1
                 argPlayer.state = "arrived"
@@ -223,13 +227,15 @@ class world():
     def move_down(self,argPlayer):
         rejected_move = False
         # print("down")
-        i,j=self.search_for_object(argPlayer)
+        #i,j=self.search_for_object(argPlayer)
+        i = argPlayer.positionY
+        j = argPlayer.positionX
         self.board[i][j]=0
         # if it the tile is a goal change the state of the state to arrived
         #self.check_player(argPlayer)
         if self.board[i+1][j]>99:
             index = self.find_goal(id=self.board[i + 1][j])
-            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not self.M_res:
                 argPlayer.state = "arrived"
                 #print("agent " + str(argPlayer.id) + " arrived at goal" + str(index + 1))
                 self.goals[index].increment_agents()
@@ -246,13 +252,15 @@ class world():
     def move_right(self,argPlayer):
         rejected_move = False
         # print("right")
-        i,j=self.search_for_object(argPlayer)
+        #i,j=self.search_for_object(argPlayer)
+        i = argPlayer.positionY
+        j = argPlayer.positionX
         self.board[i][j]=0
        # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j+1]>99:
             index = self.find_goal(id=self.board[i][j+1])
-            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not self.M_res:
                 argPlayer.state = "arrived"
                 #print("agent " + str(argPlayer.id) + " arrived at goal" + str(index + 1))
                 self.goals[index].increment_agents()
@@ -269,13 +277,15 @@ class world():
     def move_left(self,argPlayer):
         rejected_move = False
         # print("left")
-        i,j=self.search_for_object(argPlayer)
+        #i,j=self.search_for_object(argPlayer)
+        i = argPlayer.positionY
+        j = argPlayer.positionX
         self.board[i][j]=0
        # self.check_player(argPlayer)
         # if it the tile is a goal change the state of the state to arrived
         if self.board[i][j-1]>99:
             index = self.find_goal(id=self.board[i ][j- 1])
-            if not self.goals[index].num_agent == self.goals[index].capacity or not M_RES:
+            if not self.goals[index].num_agent == self.goals[index].capacity or not self.M_res:
                 argPlayer.state = "arrived"
                 #print("agent "+str(argPlayer.id)+" arrived at goal"+str(index+1))
                 self.goals[index].increment_agents()
@@ -291,10 +301,6 @@ class world():
         else:
             self.board[i][j] = argPlayer.id
 
-
-
-
-
     #a search function that returns the index of an object in a list
     def find_object_index(self,object,list):
         for i in range(len(list)):
@@ -307,6 +313,11 @@ class world():
             if self.goals[i].id == id:
                 return i
 
+    def toggle_res(self):
+        if self.M_res:
+            self.M_res = False
+        else:
+            self.M_res = True
     #check weather the created world matches specified information
     def check_validity(self):
         #placeholder variables for counting agents, goals and obstacles (default = 0)

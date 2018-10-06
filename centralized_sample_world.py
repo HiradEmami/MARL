@@ -4,18 +4,18 @@ from world import *
 from system_utility import *
 from simulation import  *
 
-NUMBER_OF_AGENTS = 8
+NUMBER_OF_AGENTS = 4
 WORLD_NAME = 'test_centralized'
 
 REWARD_SHARING = False
 COMMUNICATION = False
 
 EXPLORATION = 0.2
-LEARNING_RATE = 0.001
-DISCOUNT = 1
+LEARNING_RATE = 0.0001
+DISCOUNT = 0.99
 HIDDEN_ACTIVATION = 'sigmoid'
 OUT_ACTIVATION = 'linear'
-HIDDEN_SIZE = 50
+HIDDEN_SIZE = 100
 OUT_SIZE = 5
 
 RANDOMIZATION_TEST = False
@@ -39,8 +39,8 @@ class worldGenrator():
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=0,argY=0)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=3,argWidth=1,argX=9,argY=11)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=2,argWidth=2,argX=0,argY=0)
+        new_goal_2 = goal(argColor='green',argId=101,argHight=2,argWidth=2,argX=9,argY=11)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent

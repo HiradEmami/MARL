@@ -4,18 +4,18 @@ from world import *
 from system_utility import *
 from simulation import  *
 from shared_policy_brain import  *
-NUMBER_OF_AGENTS = 6
+NUMBER_OF_AGENTS = 4
 WORLD_NAME = 'test'
 
 VISION_X = 3
 VISION_Y = 3
 
-REWARD_SHARING = False
-COMMUNICATION = False
+REWARD_SHARING = True
+COMMUNICATION = True
 SHARED_POLICY= False
 EXPLORATION = 0.2
 LEARNING_RATE = 0.001
-DISCOUNT = 1
+DISCOUNT = 0.99
 HIDDEN_ACTIVATION = 'sigmoid'
 OUT_ACTIVATION = 'linear'
 HIDDEN_SIZE = 50
@@ -42,8 +42,8 @@ class worldGenrator():
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=0,argY=0)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=3,argWidth=1,argX=9,argY=11)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=2,argWidth=1,argX=0,argY=0)
+        new_goal_2 = goal(argColor='green',argId=101,argHight=2,argWidth=1,argX=9,argY=11)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent

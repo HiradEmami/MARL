@@ -126,7 +126,7 @@ def load_network_structure(file):
     out_activation=str(parameters[3])
     output_size=int(parameters[4])
     exploration=float(parameters[5])
-    discount=int(parameters[6])
+    discount=float(parameters[6])
 
     return hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount
 

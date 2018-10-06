@@ -66,10 +66,14 @@ class simulation():
 
         num_steps=0
         simulation_state = "running_simulation"
-
+        self.world.test_randomization_prepration()
         end_statement = "failed"
         if self.mode == "test" and RANDOMIZATION:
-            self.world.test_randomization_prepration()
+
+            Exploration = self.world.agents[0].exploration
+            for i in self.world.agents:
+                i.exploration = 0
+
         while not(simulation_state== "finished"):
 
             remain=self.number_remaining_agents()
@@ -116,6 +120,9 @@ class simulation():
         # Once the simulation is over, call to reset the world and agents
         self.reset_settings()
 
+        if self.mode == "test" and RANDOMIZATION:
+            for i in self.world.agents:
+                i.exploration = Exploration
         # at the end return number of performed steps, updated world ,
         return num_steps , self.world , result, num_arrived, num_failed
 
@@ -187,7 +194,7 @@ class simulation():
         # result can be success or fail
         result = None
 
-        if num_arrived == len(reward):
+        if num_arrived == len(reward) and self.world.goals[0].num_agent == self.world.goals[1].num_agent:
             result = "successful"
             if self.mode == "train":
                 if not self.communication:
