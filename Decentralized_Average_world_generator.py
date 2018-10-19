@@ -8,16 +8,16 @@ NUMBER_OF_AGENTS = 7
 possibles_names = ['policy_average_7x7','policy_average_3x3','baseline_average_7x7','baseline_average_3x3',
              'intention_average_7x7','intention_average_3x3','MORL_average_7x7','MORL_average_3x3','goal_average_3x3'
                    ,'goal_average_7x7']
-WORLD_NAME = 'goal_average_7x7'
+WORLD_NAME = 'policy_average_7x7'
 
 VISION_X = 7
 VISION_Y = 7
 
-MORL = True
-GOAL_COMMUNICATION = True
+MORL = False
+GOAL_COMMUNICATION = False
 REWARD_SHARING = False
-COMMUNICATION = False
-SHARED_POLICY= False
+COMMUNICATION = True
+SHARED_POLICY= True
 EXPLORATION = 0.2
 LEARNING_RATE = 0.001
 DISCOUNT = 0.99

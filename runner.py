@@ -17,7 +17,7 @@ import time
 #       Input of Variables       #
 ################################
 LOAD_CREATE = "load"
-WORLD_NAME='goal_complex_7x7'
+WORLD_NAME='MORL_complex_7x7'
 #WORLD_NAME = 'test_centralized'
 TRAINING_TESTING = "training"
 MARL_MODE = "decentralized"
@@ -27,12 +27,21 @@ MARL_MODE = "decentralized"
 SAVE_THE_SESSION = False
 VISUALIZATION = False
 
-MORL = False
-GOAL_COMMUNICATION = True
-COMMUNICATION = False
-REWARD_SHARING = False
-SHARED_POLICY = False
+def get_settings():
+    if "baseline" in WORLD_NAME:
+        return False,False,False,False
+    elif "goal" in WORLD_NAME:
+        return False,True,False,False
+    elif "policy" in WORLD_NAME:
+        return False,False,True,True
+    elif "intention" in WORLD_NAME:
+        return False,False,True,False
+    elif "MORL" in WORLD_NAME:
+        return True,False,False,False
 
+MORL , GOAL_COMMUNICATION, COMMUNICATION, SHARED_POLICY = get_settings()
+
+REWARD_SHARING = True
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = True
@@ -58,6 +67,8 @@ def decentralized_train():
                         argMORL=MORL,argGoalcommunication=GOAL_COMMUNICATION)
     training_accuracy = []
     testing_accuracy = []
+    total_num_arrived = []
+    total_num_failed = []
     num_successful= 0
     num_total = 0
     total_fail = 0
@@ -91,6 +102,7 @@ def decentralized_train():
             num_total = 0
             num_successful = 0
             total_fail = 0
+
         else:
             if result == "successful":
                 num_successful += 1
@@ -108,8 +120,10 @@ def decentralized_train():
             print(result)
             progress = 100*(i/NUM_SIMULATION)
             print(str(progress)+"% Completed")
-            test_accuracy = decentralized_test(argworld=new_world, argNumberofTest=NUM_TEST)
-            testing_accuracy.append([progress,test_accuracy])
+            test_accuracy, numArrived_agent,numFailed_agent = decentralized_test(argworld=new_world, argNumberofTest=NUM_TEST)
+            testing_accuracy.append(test_accuracy)
+            total_num_failed.append(numFailed_agent)
+            total_num_arrived.append(numArrived_agent)
         # print("In training after the state of agent is "+new_world.agents[0].mode)
 
         if PRINT_SIMULATION_DETAILS:
@@ -171,7 +185,7 @@ def decentralized_test(argworld, argNumberofTest):
     for i in argworld.agents:
         i.mode = "training"
     # print("In testing after second change the state of agent is " + argworld.agents[0].mode)
-    return  accuracy
+    return  accuracy, total_num_arrived, total_num_failed
 
 def centralized_train():
     print("\nStarting Centralized System:\n")

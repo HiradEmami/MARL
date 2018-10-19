@@ -8,16 +8,26 @@ NUMBER_OF_AGENTS = 14
 possibles_names = ['policy_complex_7x7','policy_complex_3x3','baseline_complex_7x7','baseline_complex_3x3',
              'intention_complex_7x7','intention_complex_3x3','MORL_complex_7x7','MORL_complex_3x3','goal_complex_3x3'
                    ,'goal_complex_7x7']
-WORLD_NAME = 'policy_complex_3x3'
+WORLD_NAME = 'MORL_complex_3x3'
 
 VISION_X = 3
 VISION_Y = 3
 
-MORL = True
-GOAL_COMMUNICATION = True
-REWARD_SHARING = False
-COMMUNICATION = True
-SHARED_POLICY= True
+
+def get_settings():
+    if "baseline" in WORLD_NAME:
+        return False,False,False,False
+    elif "goal" in WORLD_NAME:
+        return False,True,False,False
+    elif "policy" in WORLD_NAME:
+        return False,False,True,True
+    elif "intention" in WORLD_NAME:
+        return False,False,True,False
+    elif "MORL" in WORLD_NAME:
+        return True,False,False,False
+
+MORL , GOAL_COMMUNICATION, COMMUNICATION, SHARED_POLICY = get_settings()
+REWARD_SHARING = True
 EXPLORATION = 0.2
 LEARNING_RATE = 0.001
 DISCOUNT = 0.99
@@ -42,7 +52,7 @@ class worldGenrator():
     def generate(self,argName=WORLD_NAME):
         self.name = argName
         # creating Obstacles
-        new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
+        new_obstacle_1 = obstacle(argType='wall', argId=-1, argWidth=2, argHight=2, argX=1, argY=6)
         new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=1, argX=8, argY=2)
         new_obstacle_3 = obstacle(argType='wall', argId=-3, argWidth=2, argHight=2, argX=12, argY=6)
         new_obstacle_4 = obstacle(argType='wall', argId=-4, argWidth=2, argHight=2, argX=6, argY=9)
@@ -60,10 +70,9 @@ class worldGenrator():
         self.obstacles.append(new_obstacle_7)
         self.obstacles.append(new_obstacle_8)
 
-
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=2,argX=9,argY=10)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=2,argWidth=4,argX=3,argY=3)
+        new_goal_1 = goal(argColor='green', argId=100, argHight=3, argWidth=2, argX=9, argY=10)
+        new_goal_2 = goal(argColor='green', argId=101, argHight=2, argWidth=4, argX=3, argY=3)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
