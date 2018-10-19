@@ -12,7 +12,7 @@ from matplotlib import colors
 from system_utility import *
 
 
-file_name = "test"
+file_name = "goal_complex_7x7"
 primaryDirectory='Saved_Worlds'
 
 if not (file_name.startswith("world_")):

@@ -38,7 +38,8 @@ class world():
         self.name = worldName
 
     #Function to load the entire world
-    def loadWolrd(self,argName,argRewardSharing, argCommunication,argCentralized=False,argSharedPolicy=False):
+    def loadWolrd(self,argName,argRewardSharing, argCommunication,argCentralized=False,argSharedPolicy=False,
+                  argMORL=False,argGoalcommunication=False):
 
         print("\n#######################")
         print("Loading the World : "+str(argName))
@@ -60,6 +61,8 @@ class world():
         for i in self.agents:
             i.set_scale_parameters(argBoardWidth=self.width, argBoardHeight=self.height ,
                                    argScaleMin=SCALE_BETWEEN_MIN, argScaleMax=SCALE_BETWEEN_MAX)
+            i.set_parameter_of_communication(argCommunication=argCommunication,
+                                             argGoal=argGoalcommunication,argMORL=argMORL)
 
         self.run_scale_test()
         if not argCentralized:
@@ -77,7 +80,8 @@ class world():
                                    argHidden_size=hidden_size,argHidden_activation=hidden_activation,
                                    argOut_activation='linear', argOutputSize=output_size,
                                    argRewardSharing=argRewardSharing,create_load_mode="load",
-                                   argCommunication=argCommunication)
+                                   argCommunication=argCommunication,
+                                   argMORL=argMORL,argGoalCommunication=argGoalcommunication)
             else:
                 self.shared_policy_brain = sharedpolicy.Policy_agent(argId=12, argVisionX=3, argVisionY=3)
                 self.shared_policy_brain.set_scale_parameters(argBoardWidth=self.width, argBoardHeight=self.height,
@@ -87,7 +91,8 @@ class world():
                                argHidden_size=hidden_size, argHidden_activation=hidden_activation,
                                argOut_activation='linear', argOutputSize=output_size,
                                argRewardSharing=argRewardSharing, create_load_mode="load",
-                               argCommunication=argCommunication)
+                               argCommunication=argCommunication,
+                                                             argMORL=argMORL,argGoalCommunication=argGoalcommunication)
         else:
             print("\nLoading The Centralized Meta Agent\n")
             self.centralized_meta_agent = controller()

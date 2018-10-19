@@ -4,17 +4,20 @@ from world import *
 from system_utility import *
 from simulation import  *
 from shared_policy_brain import  *
-NUMBER_OF_AGENTS = 7
-WORLD_NAME = 'baseline_7x7'
+NUMBER_OF_AGENTS = 14
+possibles_names = ['policy_complex_7x7','policy_complex_3x3','baseline_complex_7x7','baseline_complex_3x3',
+             'intention_complex_7x7','intention_complex_3x3','MORL_complex_7x7','MORL_complex_3x3','goal_complex_3x3'
+                   ,'goal_complex_7x7']
+WORLD_NAME = 'policy_complex_3x3'
 
-VISION_X = 7
-VISION_Y = 7
+VISION_X = 3
+VISION_Y = 3
 
-MORL = False
-GOAL_COMMUNICATION = False
-REWARD_SHARING = True
+MORL = True
+GOAL_COMMUNICATION = True
+REWARD_SHARING = False
 COMMUNICATION = True
-SHARED_POLICY= False
+SHARED_POLICY= True
 EXPLORATION = 0.2
 LEARNING_RATE = 0.001
 DISCOUNT = 0.99
@@ -30,8 +33,8 @@ class worldGenrator():
         self.obstacles = []
         self.agents = []
         self.goals = []
-        self.width=10
-        self.height = 15
+        self.width=18
+        self.height = 18
 
         self.world = self.generate()
 
@@ -40,12 +43,27 @@ class worldGenrator():
         self.name = argName
         # creating Obstacles
         new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
-        new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=2, argX=6, argY=7)
+        new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=1, argX=8, argY=2)
+        new_obstacle_3 = obstacle(argType='wall', argId=-3, argWidth=2, argHight=2, argX=12, argY=6)
+        new_obstacle_4 = obstacle(argType='wall', argId=-4, argWidth=2, argHight=2, argX=6, argY=9)
+        new_obstacle_5 = obstacle(argType='wall', argId=-5, argWidth=2, argHight=1, argX=12, argY=11)
+        new_obstacle_6 = obstacle(argType='wall', argId=-6, argWidth=2, argHight=2, argX=12, argY=16)
+        new_obstacle_7 = obstacle(argType='wall', argId=-7, argWidth=2, argHight=2, argX=15, argY=2)
+        new_obstacle_8 = obstacle(argType='wall', argId=-8, argWidth=2, argHight=1, argX=16, argY=11)
+
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
+        self.obstacles.append(new_obstacle_3)
+        self.obstacles.append(new_obstacle_4)
+        self.obstacles.append(new_obstacle_5)
+        self.obstacles.append(new_obstacle_6)
+        self.obstacles.append(new_obstacle_7)
+        self.obstacles.append(new_obstacle_8)
+
+
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=1,argY=1)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=4,argWidth=1,argX=5,argY=5)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=2,argX=9,argY=10)
+        new_goal_2 = goal(argColor='green',argId=101,argHight=2,argWidth=4,argX=3,argY=3)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
@@ -59,7 +77,8 @@ class worldGenrator():
                                    argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
                                    argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
                                    argRewardSharing=REWARD_SHARING,create_load_mode="create",
-                                   argCommunication=COMMUNICATION,argGoalCommunication=GOAL_COMMUNICATION,argMORL=MORL)
+                                   argCommunication=COMMUNICATION,argGoalCommunication=GOAL_COMMUNICATION,
+                                       argMORL=MORL)
 
                 new_agent.set_network_folder(WORLD_NAME)
 

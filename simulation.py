@@ -14,7 +14,8 @@ RANDOMIZATION = True
 
 class simulation():
     def __init__(self,argWorld,argSteplimit,argDeveloperMode=False,argrewardSharing=False,argPRINT_DETAILS=False,
-                 argMode="train",argVISUALIZATION=False,argcommunication = False,argSharedPolicy=False):
+                 argMode="train",argVISUALIZATION=False,argcommunication = False,argSharedPolicy=False,
+                 argMORL=False,argGoalCommunication=False):
         self.world = argWorld
         #taking a copy of the starting board
         self.starting_board = self.copy_board(self.world.board)
@@ -29,6 +30,8 @@ class simulation():
         self.visualization=argVISUALIZATION
         self.communication = argcommunication
         self.shared_policy = argSharedPolicy
+        self.morl = argMORL
+        self.goal_communication = argGoalCommunication
 
 
     #function to reset the grid and reset player information
@@ -136,7 +139,7 @@ class simulation():
             if i.state == "arrived":
                 num_arrived +=1
                 if self.mode == "train":
-                    if not self.communication:
+                    if not self.communication and not self.morl:
                         i.perform_final_update(argreward_1=WIN_REWARD)
                     else:
                         if i.arrived_at_goal == 1:
@@ -147,7 +150,7 @@ class simulation():
             else:
                 num_failed +=1
                 if self.mode == "train":
-                    if not self.communication:
+                    if not self.communication and not self.morl:
                         i.perform_final_update(argreward_1=LOSE_REWARD)
                     else:
                         if i.arrived_at_goal == 1:
@@ -179,7 +182,7 @@ class simulation():
             if i.state == "arrived":
                 num_arrived +=1
                 if self.mode == "train":
-                    if self.communication:
+                    if self.communication or self.morl:
                         if i.arrived_at_goal == 1:
                             added_reward_1 += 0.1
                         elif i.arrived_at_goal == 2:
@@ -194,7 +197,7 @@ class simulation():
         # result can be success or fail
         result = None
 
-        if num_arrived == len(reward) and self.world.goals[0].num_agent == self.world.goals[1].num_agent:
+        if num_arrived == len(reward):
             result = "successful"
             if self.mode == "train":
                 if not self.communication:
@@ -297,6 +300,10 @@ class simulation():
             goal_agent = self.count_agents_in_goal()
             for i in self.world.agents:
                 i.set_communication_lists(argGoal_agents=goal_agent,argTarget=targets)
+        elif self.morl or self.goal_communication:
+            goal_agent = self.count_agents_in_goal()
+            for i in self.world.agents:
+                i.set_communication_lists(argGoal_agents=goal_agent, argTarget=None)
 
 
     # Function that counts how many agents are going to a goal

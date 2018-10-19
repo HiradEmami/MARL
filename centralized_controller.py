@@ -67,7 +67,7 @@ class controller():
         self.board_height = argboard_height
         self.board_width = argboard_width
 
-        self.input_size = (self.board_height * self.board_width * 3) + 2
+        self.input_size = (self.board_height * self.board_width ) + 2
         print("Length of input: " + str(self.input_size))
 
         self.output_size = argOutputSize
@@ -431,10 +431,10 @@ class controller():
             counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
 
             result_list = []
-            for i in argObstacleList:
-                result_list.append(i)
-            for j in argGoalList:
-                result_list.append(j)
+           # for i in argObstacleList:
+               # result_list.append(i)
+           # for j in argGoalList:
+               # result_list.append(j)
             for k in argAgnetList:
                 result_list.append(k)
 
@@ -448,7 +448,7 @@ class controller():
             result_list.append(node_x)
             result_list.append(node_y)
 
-            counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
+            counter =  len(argAgnetList) + 2
 
 
             if not len(result_list) == counter:

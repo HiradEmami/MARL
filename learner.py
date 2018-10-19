@@ -49,7 +49,7 @@ class agent():
         self.network_folder = None
         self.reward_Sharing=False
         self.previous_reward=0
-        self.pad_value=-5
+        self.pad_value=-9
 
         self.target_goal = 0
         self.communicate_target = None
@@ -62,10 +62,19 @@ class agent():
     def set_total_agent_number(self,argNum):
         self.total_agent = argNum
 
+    def set_parameter_of_communication(self,argCommunication,argGoal,argMORL):
+        self.MORL=argMORL
+        self.communication =argCommunication
+        self.goal_communication =argGoal
 
-    def set_communication_lists(self,argTarget,argGoal_agents):
-        self.communicate_target = argTarget
-        self.communicate_goal_agents = argGoal_agents
+    def set_communication_lists(self,argTarget=None,argGoal_agents=None):
+        if self.goal_communication or self.MORL:
+            self.communicate_goal_agents = argGoal_agents
+            self.communicate_target = []
+        elif self.communication:
+            self.communicate_goal_agents = argGoal_agents
+            self.communicate_target = argTarget
+
 
     def load_networkd(self):
         self.NN.__del__()
@@ -119,7 +128,7 @@ class agent():
     # parameters. The function is called after creation of the agent
     def create_brain(self,argExploration, argDiscount, argLearning_rate, argHidden_size, argHidden_activation,
                      argOut_activation,argOutputSize = 10,create_load_mode = "create",
-                     argRewardSharing = False, argCommunication = False):
+                     argRewardSharing = False, argCommunication = False, argGoalCommunication=False,argMORL=False):
         # the primary neural network
         self.hidden_size = argHidden_size
         self.learning_rate = argLearning_rate
@@ -128,9 +137,18 @@ class agent():
         # the size of input and output layers
         self.reward_Sharing = argRewardSharing
         self.communication = argCommunication
+        self.goal_communication =argGoalCommunication
+        self.MORL=argMORL
+
 
         if self.communication:
             self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2 + 2
+            self.output_size = 10
+        elif self.goal_communication:
+            self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
+            self.output_size = 5
+        elif self.MORL:
+            self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2
             self.output_size = 10
         else:
             self.input_size = (self.vision_x * self.vision_y *3)+ 2
@@ -174,7 +192,10 @@ class agent():
             x1 = min(len(argBoard[0]), self.positionX + self.marginx + 1)
             # calculating the boundaries
             observed= self.slice_list(arglist=argBoard,x0=x0,x1=x1,y0=y0,y1=y1)
-            observed= self.pad_grid(argboard=observed,width_board=len(argBoard[0]),height_board=len(argBoard))
+            if self.vision_x == 3:
+                observed= self.pad_grid(argboard=observed,width_board=len(argBoard[0]),height_board=len(argBoard))
+            elif self.vision_x == 7:
+                observed = self.pad_grid_seven(argboard=observed, width_board=len(argBoard[0]), height_board=len(argBoard))
             return observed
 
     def slice_list(self,arglist,x0,x1,y0,y1):
@@ -201,6 +222,60 @@ class agent():
 
         elif self.positionY == height_board - 1:
             top_bottom = "bottom"
+            argboard = self.pad_bottom(argboard)
+        return argboard
+
+    def pad_grid_seven(self,argboard, width_board, height_board):
+        left_right = "center"
+        top_bottom = "center"
+        if self.positionX == 0:
+            left_right = "left_3"
+            argboard = self.pad_left(argboard)
+            argboard = self.pad_left(argboard)
+            argboard = self.pad_left(argboard)
+        elif self.positionX == 1:
+            left_right = "left_2"
+            argboard = self.pad_left(argboard)
+            argboard = self.pad_left(argboard)
+        elif self.positionX == 2:
+            left_right = "left_1"
+            argboard = self.pad_left(argboard)
+        elif self.positionX == width_board - 1:
+            left_right = "right_3"
+            argboard = self.pad_right(argboard)
+            argboard = self.pad_right(argboard)
+            argboard = self.pad_right(argboard)
+        elif self.positionX == width_board - 2:
+            left_right = "right_2"
+            argboard = self.pad_right(argboard)
+            argboard = self.pad_right(argboard)
+        elif self.positionX == width_board - 3:
+            left_right = "right_1"
+            argboard = self.pad_right(argboard)
+
+        if self.positionY == 0:
+            top_bottom = "top_3"
+            argboard = self.pad_top(argboard)
+            argboard = self.pad_top(argboard)
+            argboard = self.pad_top(argboard)
+        elif self.positionY == 1:
+            top_bottom = "top_2"
+            argboard = self.pad_top(argboard)
+            argboard = self.pad_top(argboard)
+        elif self.positionY == 2:
+            top_bottom = "top_1"
+            argboard = self.pad_top(argboard)
+        elif self.positionY == height_board - 1:
+            top_bottom = "bottom_3"
+            argboard = self.pad_bottom(argboard)
+            argboard = self.pad_bottom(argboard)
+            argboard = self.pad_bottom(argboard)
+        elif self.positionY == height_board - 2:
+            top_bottom = "bottom_2"
+            argboard = self.pad_bottom(argboard)
+            argboard = self.pad_bottom(argboard)
+        elif self.positionY == height_board - 3:
+            top_bottom = "bottom_1"
             argboard = self.pad_bottom(argboard)
         return argboard
 
@@ -658,6 +733,8 @@ class agent():
             # If we had communication between agents we have to add two nods to the input layer
             if self.communication:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList)+ 2 + 2 + 2
+            elif self.goal_communication or self.MORL:
+                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2 + 2
             else:
                 counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
 
@@ -695,8 +772,15 @@ class agent():
                      # self.communicate_target[1],self.communicate_target[1])
                 result_list.append(target_1)
                 result_list.append(target_2)
-            else:
-                counter = len(argObstacleList) + len(argGoalList) + len(argAgnetList) + 2
+
+            elif self.goal_communication or self.MORL:
+                goal_1 = self.scale(argNum=self.communicate_goal_agents[0],argMax=self.total_agent,argMin=0,
+                                    scale_max=1,scale_min=0)
+                goal_2 = self.scale(argNum=self.communicate_goal_agents[1], argMax=self.total_agent, argMin=0,
+                                    scale_max=1, scale_min=0)
+                result_list.append(goal_1)
+                result_list.append(goal_2)
+
 
 
             if not len(result_list) == counter:

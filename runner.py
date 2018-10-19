@@ -1,4 +1,4 @@
-from pip._vendor.distlib.compat import raw_input
+
 
 __author__='Hirad Emami Alagha - S3218139'
 
@@ -17,7 +17,7 @@ import time
 #       Input of Variables       #
 ################################
 LOAD_CREATE = "load"
-WORLD_NAME="test"
+WORLD_NAME='goal_complex_7x7'
 #WORLD_NAME = 'test_centralized'
 TRAINING_TESTING = "training"
 MARL_MODE = "decentralized"
@@ -27,8 +27,10 @@ MARL_MODE = "decentralized"
 SAVE_THE_SESSION = False
 VISUALIZATION = False
 
-COMMUNICATION = True
-REWARD_SHARING = True
+MORL = False
+GOAL_COMMUNICATION = True
+COMMUNICATION = False
+REWARD_SHARING = False
 SHARED_POLICY = False
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
@@ -38,10 +40,10 @@ PRINT_TEST_DETAILS = True
 NUM_SIMULATION = 20000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
-TRAINING_ACCURACY_RECORDER = 250 # number of simulations before one tick data is recorded
+TRAINING_ACCURACY_RECORDER = 1000# number of simulations before one tick data is recorded
 
 NUM_TEST = 100
-STEP_LIMITS = 200
+STEP_LIMITS = 300
 ################################
 #       End of Variables       #
 ################################
@@ -52,11 +54,13 @@ def decentralized_train():
     # Loading the world and the agents
     new_world = world(argCreationMode=LOAD_CREATE)
     new_world.loadWolrd(argName=WORLD_NAME,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION,
-                        argSharedPolicy=SHARED_POLICY)
+                        argSharedPolicy=SHARED_POLICY,
+                        argMORL=MORL,argGoalcommunication=GOAL_COMMUNICATION)
     training_accuracy = []
     testing_accuracy = []
     num_successful= 0
     num_total = 0
+    total_fail = 0
 
     for i in new_world.agents:
         i.set_total_agent_number(len(new_world.agents))
@@ -75,19 +79,29 @@ def decentralized_train():
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="train"
                                         ,argVISUALIZATION=VISUALIZATION
                                         ,argcommunication=COMMUNICATION
-                                        ,argSharedPolicy=SHARED_POLICY)
+                                        ,argSharedPolicy=SHARED_POLICY,
+                                        argMORL=MORL,argGoalCommunication=GOAL_COMMUNICATION)
 
         # getting some of the information back
-        _ , new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
+        MoveCount , new_world, result, num_arrived, num_failed = simulation_current.run_one_simulation()
 
         if num_total == TRAINING_ACCURACY_RECORDER:
             acc = (num_successful / num_total) * 100
             training_accuracy.append(acc)
             num_total = 0
             num_successful = 0
+            total_fail = 0
         else:
             if result == "successful":
                 num_successful += 1
+                print("success "+ str(num_successful) +", num_arrived, num_failed: "+str(num_arrived), str(num_failed)+
+                      ", Move: "+str(MoveCount))
+
+            else:
+                total_fail +=1
+                print("failed " + str(total_fail) + ", num_arrived, num_failed: " + str(num_arrived),
+                      str(num_failed)+
+                      ", Move: "+str(MoveCount))
 
         # print("In training the state of agent is " + new_world.agents[0].mode)
         if (i % EPOCHES)==0 and not i==0:
@@ -136,7 +150,8 @@ def decentralized_test(argworld, argNumberofTest):
                                   argPRINT_DETAILS=PRINT_SIMULATION_DETAILS, argMode="test",
                                                            argVISUALIZATION=VISUALIZATION
                                      , argcommunication=COMMUNICATION,
-                                     argSharedPolicy=SHARED_POLICY)
+                                     argSharedPolicy=SHARED_POLICY,
+                                     argMORL=MORL, argGoalCommunication=GOAL_COMMUNICATION)
         num_move, argworld, result, num_arrived, num_failed = test_simulation.run_one_simulation()
 
 
@@ -300,6 +315,7 @@ def save_results(final_results):
         file_1.write("\n")
     # closing the file
     file_1.close()
+
 
 if __name__ == '__main__':
     starting_time = time.time()
