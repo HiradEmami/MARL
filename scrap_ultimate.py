@@ -197,3 +197,8 @@ print_grid(Grid)
 t = get_observable_board(Grid)
 print_grid(t)
 print(len(t),len(t[0]))
+
+
+
+for i in range(1,11):
+    print(i)

@@ -3,27 +3,19 @@ from learner import *
 from world import *
 from system_utility import *
 from simulation import  *
-from shared_policy_brain import  *
-NUMBER_OF_AGENTS = 7
-possibles_names = ['policy_average_7x7','policy_average_3x3','baseline_average_7x7','baseline_average_3x3',
-             'intention_average_7x7','intention_average_3x3','MORL_average_7x7','MORL_average_3x3','goal_average_3x3'
-                   ,'goal_average_7x7']
-WORLD_NAME = 'policy_average_3x3'
 
-VISION_X = 3
-VISION_Y = 3
+NUMBER_OF_AGENTS = 14
+WORLD_NAME = 'centralized_complex_entire'
 
-MORL = False
-GOAL_COMMUNICATION = False
 REWARD_SHARING = False
-COMMUNICATION = True
-SHARED_POLICY= True
+COMMUNICATION = False
+
 EXPLORATION = 0.2
 LEARNING_RATE = 0.001
 DISCOUNT = 0.99
 HIDDEN_ACTIVATION = 'sigmoid'
 OUT_ACTIVATION = 'linear'
-HIDDEN_SIZE = 50
+HIDDEN_SIZE = 100
 OUT_SIZE = 5
 
 RANDOMIZATION_TEST = False
@@ -33,75 +25,63 @@ class worldGenrator():
         self.obstacles = []
         self.agents = []
         self.goals = []
-        self.width=14
-        self.height = 14
+        self.width = 18
+        self.height = 18
 
         self.world = self.generate()
 
-
-    def generate(self,argName=WORLD_NAME):
+    def generate(self, argName=WORLD_NAME):
         self.name = argName
         # creating Obstacles
-        new_obstacle_1 = obstacle(argType='wall',argId=-1,argWidth=2,argHight=2,argX=1,argY=6)
+        new_obstacle_1 = obstacle(argType='wall', argId=-1, argWidth=2, argHight=2, argX=1, argY=6)
         new_obstacle_2 = obstacle(argType='wall', argId=-2, argWidth=2, argHight=1, argX=8, argY=2)
         new_obstacle_3 = obstacle(argType='wall', argId=-3, argWidth=2, argHight=2, argX=12, argY=6)
         new_obstacle_4 = obstacle(argType='wall', argId=-4, argWidth=2, argHight=2, argX=6, argY=9)
         new_obstacle_5 = obstacle(argType='wall', argId=-5, argWidth=2, argHight=1, argX=12, argY=11)
+        new_obstacle_6 = obstacle(argType='wall', argId=-6, argWidth=2, argHight=2, argX=12, argY=16)
+        new_obstacle_7 = obstacle(argType='wall', argId=-7, argWidth=2, argHight=2, argX=15, argY=2)
+        new_obstacle_8 = obstacle(argType='wall', argId=-8, argWidth=2, argHight=1, argX=16, argY=11)
 
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
         self.obstacles.append(new_obstacle_3)
         self.obstacles.append(new_obstacle_4)
         self.obstacles.append(new_obstacle_5)
+        self.obstacles.append(new_obstacle_6)
+        self.obstacles.append(new_obstacle_7)
+        self.obstacles.append(new_obstacle_8)
 
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=3,argWidth=1,argX=9,argY=10)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=2,argWidth=2,argX=3,argY=3)
+        new_goal_1 = goal(argColor='green', argId=100, argHight=3, argWidth=2, argX=9, argY=10)
+        new_goal_2 = goal(argColor='green', argId=101, argHight=2, argWidth=4, argX=3, argY=3)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent
         num_agents=NUMBER_OF_AGENTS
         for i in range(1,num_agents+1):
             # creating the agent
-            new_agent = agent(argId=i,argVisionX=VISION_X,argVisionY=VISION_Y)
-            if not SHARED_POLICY:
-                # creating the network of the agent
-                new_agent.create_brain(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
-                                   argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
-                                   argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
-                                   argRewardSharing=REWARD_SHARING,create_load_mode="create",
-                                   argCommunication=COMMUNICATION,argGoalCommunication=GOAL_COMMUNICATION,
-                                       argMORL=MORL)
-
-                new_agent.set_network_folder(WORLD_NAME)
-
-                new_agent.save_network()
+            new_agent = agent(argId=i,argVisionX=3,argVisionY=3)
             # add the agent to the list
             self.agents.append(new_agent)
 
-        if SHARED_POLICY:
+        # create the meta agent
+        meta_centralized_agent = controller()
+        # creating the network of the Meta agent
+        meta_centralized_agent.build_network(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
+                               argHidden_size=HIDDEN_SIZE,argHidden_activation=HIDDEN_ACTIVATION,
+                               argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
+                               argRewardSharing=REWARD_SHARING,create_load_mode="create"
+                                             ,argboard_width=self.width, argboard_height=self.height)
 
-            shared_brain = Policy_agent(argId=12, argVisionX=3, argVisionY=3)
+        meta_centralized_agent.set_network_folder(WORLD_NAME)
 
-            # creating the network of the agent
-            shared_brain.shared_create_brain(argExploration=EXPLORATION, argDiscount=DISCOUNT, argLearning_rate=LEARNING_RATE,
-                                   argHidden_size=HIDDEN_SIZE, argHidden_activation=HIDDEN_ACTIVATION,
-                                   argOut_activation=OUT_ACTIVATION, argOutputSize=OUT_SIZE,
-                                   argRewardSharing=REWARD_SHARING, create_load_mode="create",
-                                   argCommunication=COMMUNICATION,
-                                             argMORL=MORL,argGoalCommunication=GOAL_COMMUNICATION)
-
-            shared_brain.set_network_folder(WORLD_NAME)
-
-            shared_brain.save_network()
-
+        meta_centralized_agent.save_network()
 
         self.world = world(argCreationMode="create",worldName=self.name)
 
         self.world.createWorld(argWidth=self.width,argHeigth=self.height, argObstacleList=self.obstacles, goalList=self.goals, argAgentList=self.agents)
 
-        if SHARED_POLICY:
-            self.world.set_shared_policy_brain(shared_brain)
+        self.world.set_meta_controller_agent(argMetaController=meta_centralized_agent)
 
         print(self.world.board)
         print(len(self.world.goals))
@@ -109,15 +89,11 @@ class worldGenrator():
         print(len(self.world.obstacles))
         self.world.check_validity()
 
-        self.world.saveWorld(argWorldName=self.name,argShared_policy=SHARED_POLICY)
+        self.world.saveWorld(argWorldName=self.name,argCentralized=True,argMetaAgent=self.world.centralized_meta_agent)
 
         #testing the world
-        if not SHARED_POLICY:
-            for i in self.world.agents:
-                i.NN.__del__()
-        else:
-            self.world.shared_policy_brain.NN.__del__()
 
+        self.world.centralized_meta_agent.NN.__del__()
         new_world = world(argCreationMode="load")
         if RANDOMIZATION_TEST:
             print("\n##########################")
@@ -135,8 +111,8 @@ class worldGenrator():
             print(self.world.board)
 
 
-        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION,
-                            argSharedPolicy=SHARED_POLICY,argMORL=MORL,argGoalcommunication=GOAL_COMMUNICATION)
+        new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION
+                            ,argCentralized=True)
         for i in new_world.agents:
             print(i.default_positionX,i.default_positionY)
         new_world.print_the_world()

@@ -26,7 +26,7 @@ possibles_names_complex = ['policy_complex_7x7','policy_complex_3x3','baseline_c
              'intention_complex_7x7','intention_complex_3x3','MORL_complex_7x7','MORL_complex_3x3','goal_complex_3x3'
                    ,'goal_complex_7x7','centralized_complex_entire']
 
-LOOP_THROUGH_THESE_SYSTEMS = ['policy_complex_7x7','policy_complex_3x3']
+LOOP_THROUGH_THESE_SYSTEMS = ['policy_complex_7x7','intention_complex_3x3']
 
 NUM_TOTAL_TESTS = 10
 
@@ -60,19 +60,20 @@ DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to s
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = True
 
-NUM_SIMULATION = 100
+NUM_SIMULATION = 20000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
-TRAINING_ACCURACY_RECORDER = 5 #it is equal to the 0.05 of 20k train
+TRAINING_ACCURACY_RECORDER = 1000 #it is equal to the 0.05 of 20k train
 
-NUM_TEST = 4
-STEP_LIMITS = 200
+NUM_TEST = 100
+STEP_LIMITS = 300
 ################################
 #       End of Variables       #
 ################################
 
 # The primary function to train the decentralized system
 def decentralized_train():
+    print(WORLD_NAME)
     print("\nStarting Decentralized System:\n")
     # Loading the world and the agents
     new_world = world(argCreationMode=LOAD_CREATE)
@@ -347,18 +348,26 @@ def save_results(train_accuracy,test_accuracy,num_arrived,num_failed,testNumber,
     file_1.close()
 
 
-
+def print_updated_setting():
+    print("Setting changes has happened the current system is\n")
+    print("MORL Goal Intention Policy MARL Name")
+    print(MORL , GOAL_COMMUNICATION, COMMUNICATION, SHARED_POLICY,MARL_MODE,WORLD_NAME)
 if __name__ == '__main__':
-    for i in range(1, NUM_TOTAL_TESTS + 1):
-        starting_time = time.time()
-        print("Epoches: " + str(EPOCHES))
-        if MARL_MODE == "decentralized":
-            testing_accuracy, training_accuracy, total_num_arrived, total_num_failed = decentralized_train()
-        elif MARL_MODE == "centralized":
-            testing_accuracy, training_accuracy, total_num_arrived, total_num_failed = centralized_train()
-        # print("\nTotal progress :\n")
-        # print(testing_accuracy)
-        # print(training_accuracy)
-        end_time = time.time() - starting_time
-        save_results(training_accuracy, testing_accuracy, total_num_arrived, total_num_failed, i, end_time)
-        print("\nTotal runtime:     \t{:.1f}".format(end_time) + " s")
+    for j in LOOP_THROUGH_THESE_SYSTEMS:
+        WORLD_NAME = j
+        MORL, GOAL_COMMUNICATION, COMMUNICATION, SHARED_POLICY, MARL_MODE=get_settings()
+        print_updated_setting()
+        for j in LOOP_THROUGH_THESE_SYSTEMS:
+            for i in range(1, NUM_TOTAL_TESTS + 1):
+                starting_time = time.time()
+                print("Epoches: " + str(EPOCHES))
+                if MARL_MODE == "decentralized":
+                    testing_accuracy, training_accuracy, total_num_arrived, total_num_failed = decentralized_train()
+                elif MARL_MODE == "centralized":
+                    testing_accuracy, training_accuracy = centralized_train()
+                # print("\nTotal progress :\n")
+                # print(testing_accuracy)
+                # print(training_accuracy)
+                end_time = time.time() - starting_time
+                save_results(training_accuracy, testing_accuracy, total_num_arrived, total_num_failed, i, end_time)
+                print("\nTotal runtime:     \t{:.1f}".format(end_time) + " s")

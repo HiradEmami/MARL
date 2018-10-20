@@ -39,8 +39,8 @@ class worldGenrator():
         self.obstacles.append(new_obstacle_1)
         self.obstacles.append(new_obstacle_2)
         # creating a goal
-        new_goal_1 = goal(argColor='green',argId=100,argHight=2,argWidth=4,argX=1,argY=1)
-        new_goal_2 = goal(argColor='green',argId=101,argHight=4,argWidth=2,argX=5,argY=5)
+        new_goal_1 = goal(argColor='green',argId=100,argHight=1,argWidth=4,argX=1,argY=1)
+        new_goal_2 = goal(argColor='green',argId=101,argHight=4,argWidth=1,argX=5,argY=5)
         self.goals.append(new_goal_1)
         self.goals.append(new_goal_2)
         # creating the agent

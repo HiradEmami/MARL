@@ -61,7 +61,7 @@ def save_grid(outputDirect,board):
     file_1.close()
 
 def save_network_structure(outputDirect,argAgent):
-
+    print("saving network")
     # using the sample agent to save the information of the network and learning parameters
     info=argAgent
     # Opening / creating the save file

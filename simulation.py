@@ -72,10 +72,12 @@ class simulation():
         self.world.test_randomization_prepration()
         end_statement = "failed"
         if self.mode == "test" and RANDOMIZATION:
+            if not self.shared_policy:
+                Exploration = self.world.agents[0].exploration
+                for i in self.world.agents:
+                    i.exploration = 0
 
-            Exploration = self.world.agents[0].exploration
-            for i in self.world.agents:
-                i.exploration = 0
+
 
         while not(simulation_state== "finished"):
 
@@ -123,7 +125,7 @@ class simulation():
         # Once the simulation is over, call to reset the world and agents
         self.reset_settings()
 
-        if self.mode == "test" and RANDOMIZATION:
+        if self.mode == "test" and RANDOMIZATION and not self.shared_policy:
             for i in self.world.agents:
                 i.exploration = Exploration
         # at the end return number of performed steps, updated world ,
