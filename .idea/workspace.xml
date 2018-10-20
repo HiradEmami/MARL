@@ -1,30 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4fd8baef-b3bb-4750-bd4c-563d7e88ec6f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/centralized_Average_world_generator.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/centralized_Complex_world_generator.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/brain.txt" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/brain.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/info.txt" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/info.txt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/tf_checkpoints/meta_agent/checkpoint" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/tf_checkpoints/meta_agent/checkpoint" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/tf_checkpoints/meta_agent/network.ckpt.data-00000-of-00001" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/tf_checkpoints/meta_agent/network.ckpt.data-00000-of-00001" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/tf_checkpoints/meta_agent/network.ckpt.index" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/tf_checkpoints/meta_agent/network.ckpt.index" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/tf_checkpoints/meta_agent/network.ckpt.meta" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/tf_checkpoints/meta_agent/network.ckpt.meta" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized/world.txt" afterPath="$PROJECT_DIR$/Saved_Worlds/world_test_centralized_average/world.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.index" afterPath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.index" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Decentralized_Average_world_generator.py" afterPath="$PROJECT_DIR$/Decentralized_Average_world_generator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/info.txt" afterPath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/info.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.data-00000-of-00001" afterPath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.data-00000-of-00001" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.meta" afterPath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/tf_checkpoints/agent_12/network.ckpt.meta" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/world.txt" afterPath="$PROJECT_DIR$/Saved_Worlds/world_policy_average_3x3/world.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/centralized_sample_world.py" afterPath="$PROJECT_DIR$/centralized_sample_world.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runner.py" afterPath="$PROJECT_DIR$/runner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scrap_ultimate.py" afterPath="$PROJECT_DIR$/scrap_ultimate.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulation.py" afterPath="$PROJECT_DIR$/simulation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/system_utility.py" afterPath="$PROJECT_DIR$/system_utility.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/visualization.py" afterPath="$PROJECT_DIR$/visualization.py" />
-    </list>
+    <list default="true" id="4fd8baef-b3bb-4750-bd4c-563d7e88ec6f" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -53,8 +30,8 @@
       <file leaf-file-name="runner_final_experiment.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/runner_final_experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12829">
-              <caret line="20" column="40" lean-forward="false" selection-start-line="20" selection-start-column="40" selection-end-line="20" selection-end-column="40" />
+            <state relative-caret-position="13880">
+              <caret line="355" column="16" lean-forward="false" selection-start-line="355" selection-start-column="16" selection-end-line="355" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -512,8 +489,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-16" y="-16" width="3872" height="2092" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36339238" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29898015" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39150143" sideWeight="0.5021471" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974505" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -876,8 +854,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/runner_final_experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12829">
-          <caret line="20" column="40" lean-forward="false" selection-start-line="20" selection-start-column="40" selection-end-line="20" selection-end-column="40" />
+        <state relative-caret-position="13880">
+          <caret line="355" column="16" lean-forward="false" selection-start-line="355" selection-start-column="16" selection-end-line="355" selection-end-column="16" />
           <folding />
         </state>
       </provider>
