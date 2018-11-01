@@ -1,0 +1,2 @@
+import runner_final_experiment
+runner_final_experiment.run_experiment(world_name='MORL_complex_7x7')

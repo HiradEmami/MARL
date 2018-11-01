@@ -61,11 +61,11 @@ DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to s
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = False
 
-NUM_SIMULATION = 20000
+NUM_SIMULATION = 40000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
 
-TRAINING_ACCURACY_RECORDER = 1000 #it is equal to the 0.05 of 20k train
+TRAINING_ACCURACY_RECORDER = 2000 #it is equal to the 0.05 of 20k train
 
 NUM_TEST = 100
 STEP_LIMITS = 300
@@ -321,17 +321,17 @@ def centralized_test(argworld, argNumberofTest):
 
 def save_results(train_accuracy,test_accuracy,num_arrived,num_failed,testNumber,end_time):
     # create the results folder if it is not there
-    if not os.path.exists("Results/"):
-        print("creating The primary folder under " + "Results/")
-        os.makedirs("Results/")
-        print(" The Folder for all saved worlds is created! \n The directory is : " + "Results/")
+    if not os.path.exists("Results_40000/"):
+        print("creating The primary folder under " + "Results_40000/")
+        os.makedirs("Results_40000/")
+        print(" The Folder for all saved worlds is created! \n The directory is : " + "Results_40000/")
 
 
     # create the file name
-    finalpath = "Results/" + WORLD_NAME + "/"
+    finalpath = "Results_40000/" + WORLD_NAME + "/"
 
     if not os.path.exists(finalpath):
-        print("creating The primary folder under " + "Results/")
+        print("creating The primary folder under " + "Results_40000/")
         os.makedirs(finalpath)
         print(" The Folder for all saved worlds is created! \n The directory is : " + finalpath)
 

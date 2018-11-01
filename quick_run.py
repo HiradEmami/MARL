@@ -28,7 +28,7 @@ possibles_names_complex = ['policy_complex_7x7','policy_complex_3x3','baseline_c
 
 LOOP_THROUGH_THESE_SYSTEMS = ['policy_complex_7x7','intention_complex_3x3']
 
-NUM_TOTAL_TESTS = 10
+NUM_TOTAL_TESTS = 2
 
 
 WORLD_NAME='centralized_complex_entire'
@@ -61,14 +61,14 @@ DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to s
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = False
 
-NUM_SIMULATION = 20000
+NUM_SIMULATION = 10
 
-EPOCHES = math.floor(0.05 * NUM_SIMULATION)
+EPOCHES = math.floor(0.1 * NUM_SIMULATION)
 
-TRAINING_ACCURACY_RECORDER = 1000 #it is equal to the 0.05 of 20k train
+TRAINING_ACCURACY_RECORDER = 1 #it is equal to the 0.05 of 20k train
 
-NUM_TEST = 100
-STEP_LIMITS = 300
+NUM_TEST = 1
+STEP_LIMITS = 1
 
 ################################
 #       End of Variables       #

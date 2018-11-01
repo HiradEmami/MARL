@@ -12,7 +12,7 @@ from matplotlib import colors
 from system_utility import *
 
 
-file_name = 'centralized_average_entire'
+file_name = 'centralized_complex_entire'
 primaryDirectory='Saved_Worlds'
 
 if not (file_name.startswith("world_")):
