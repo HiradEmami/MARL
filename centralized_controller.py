@@ -17,7 +17,7 @@ class controller():
         # counter of number of moves
         self.move_count = 0
         # cost of every action
-        self.step_cost = argStepCost
+        self.step_cost = -0.2
         self.network_folder = None
         self.reward_Sharing=False
         self.previous_reward=0
@@ -200,7 +200,7 @@ class controller():
         reward = argreward
 
         # previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
-        previous_output_layer[self.previous_index] = reward
+        previous_output_layer[self.previous_index]=(self.discount * new_confidence)+reward
         # assigining the previous reward so that simulation uses that for reward sharing if needed
         self.previous_reward = reward
 
@@ -404,7 +404,7 @@ class controller():
             for j in range(len(argGrid[0])):
                 if argGrid[i][j]>0 and argGrid[i][j]<100:
                     if argGrid[i][j]==argAgent.id:
-                        new_list.append(0)
+                        new_list.append(1)
                     else:
                         new_list.append(1)
                 else:

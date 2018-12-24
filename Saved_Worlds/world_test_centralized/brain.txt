@@ -1,4 +1,4 @@
-100
+50
 0.001
 sigmoid
 linear

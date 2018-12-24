@@ -1,12 +1,12 @@
 7 5 2
 14 14 centralized_average_entire
-1 3 3 0 2 -0.1 train
-2 3 3 2 9 -0.1 train
-3 3 3 1 13 -0.1 train
-4 3 3 3 1 -0.1 train
-5 3 3 1 11 -0.1 train
-6 3 3 12 1 -0.1 train
-7 3 3 2 3 -0.1 train
+1 3 3 10 0 -0.1 train
+2 3 3 1 11 -0.1 train
+3 3 3 6 1 -0.1 train
+4 3 3 3 5 -0.1 train
+5 3 3 10 6 -0.1 train
+6 3 3 8 3 -0.1 train
+7 3 3 0 2 -0.1 train
 -1 2 2 1 6 wall
 -2 2 1 8 2 wall
 -3 2 2 12 6 wall

@@ -26,12 +26,12 @@ possibles_names_complex = ['policy_complex_7x7','policy_complex_3x3','baseline_c
              'intention_complex_7x7','intention_complex_3x3','MORL_complex_7x7','MORL_complex_3x3','goal_complex_3x3'
                    ,'goal_complex_7x7','centralized_complex_entire']
 
-LOOP_THROUGH_THESE_SYSTEMS = ['policy_complex_7x7','intention_complex_3x3']
+LOOP_THROUGH_THESE_SYSTEMS = ['centralized_average_entire']
 
 NUM_TOTAL_TESTS = 10
 
 
-WORLD_NAME='centralized_complex_entire'
+WORLD_NAME='centralized_average_entire'
 
 TRAINING_TESTING = "training"
 # Would save the world after training
@@ -59,16 +59,16 @@ REWARD_SHARING = True
 
 DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to see if system is working correctly
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
-PRINT_TEST_DETAILS = False
+PRINT_TEST_DETAILS = True
 
-NUM_SIMULATION = 20000
+NUM_SIMULATION = 2000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
 
-TRAINING_ACCURACY_RECORDER = 1000 #it is equal to the 0.05 of 20k train
+TRAINING_ACCURACY_RECORDER = 100 #it is equal to the 0.05 of 20k train
 
 NUM_TEST = 100
-STEP_LIMITS = 300
+STEP_LIMITS = 400
 
 ################################
 #       End of Variables       #

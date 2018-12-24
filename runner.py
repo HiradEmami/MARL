@@ -26,7 +26,7 @@ possibles_names_complex = ['policy_complex_7x7','policy_complex_3x3','baseline_c
              'intention_complex_7x7','intention_complex_3x3','MORL_complex_7x7','MORL_complex_3x3','goal_complex_3x3'
                    ,'goal_complex_7x7','centralized_complex_entire']
 
-LOOP_THROUGH_THESE_SYSTEMS = ['policy_complex_7x7','policy_complex_3x3']
+LOOP_THROUGH_THESE_SYSTEMS = ['MORL_average_7x7']
 
 NUM_TOTAL_TESTS = 10
 
