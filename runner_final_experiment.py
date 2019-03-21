@@ -11,7 +11,9 @@ from centralized_controller import *
 from centralized_simulation import *
 import math
 import time
-
+import visualization
+import tkinter as tk
+import cv2
 
 ################################
 #       Input of Variables       #
@@ -61,14 +63,14 @@ DEVELOPER_MODE = False      # Developer_mode controls huge prints and check to s
 PRINT_SIMULATION_DETAILS = False # Print_simulation_details prints more information about the simulation
 PRINT_TEST_DETAILS = True
 
-NUM_SIMULATION = 2000
+NUM_SIMULATION = 40000
 
 EPOCHES = math.floor(0.05 * NUM_SIMULATION)
 
-TRAINING_ACCURACY_RECORDER = 100 #it is equal to the 0.05 of 20k train
+TRAINING_ACCURACY_RECORDER = 2000 #it is equal to the 0.05 of 20k train
 
 NUM_TEST = 100
-STEP_LIMITS = 400
+STEP_LIMITS = 300
 
 ################################
 #       End of Variables       #
@@ -158,8 +160,13 @@ def decentralized_train():
     testing_accuracy.append(final_test_accuracy)
     total_num_arrived.append(numArrived_agent)
     total_num_failed.append(numFailed_agent)
+    success = []
+    failed = []
+    for i in testing_accuracy:
+        success.append(i)
+        failed.append(100 - i)
 
-    return testing_accuracy, training_accuracy,total_num_arrived,total_num_failed
+    return success, failed, total_num_arrived, total_num_failed
 
 def decentralized_test(argworld, argNumberofTest):
   #setting the mode to testing
@@ -275,8 +282,13 @@ def centralized_train():
     testing_accuracy.append(final_test_accuracy)
     total_num_arrived.append(numArrived_agent)
     total_num_failed.append(numFailed_agent)
+    success = []
+    failed = []
+    for i in test_accuracy:
+        success.append(i)
+        failed.append(100-i)
 
-    return testing_accuracy, training_accuracy, total_num_arrived, total_num_failed
+    return  success, failed, total_num_arrived, total_num_failed
 
 def centralized_test(argworld, argNumberofTest):
     # setting the mode to testing
@@ -319,7 +331,7 @@ def centralized_test(argworld, argNumberofTest):
         # print("In testing after second change the state of agent is " + argworld.agents[0].mode)
     return accuracy, total_num_arrived, total_num_failed
 
-def save_results(train_accuracy,test_accuracy,num_arrived,num_failed,testNumber,end_time):
+def save_results(success,failed,num_arrived,num_failed,testNumber,end_time):
     # create the results folder if it is not there
     if not os.path.exists("Results/"):
         print("creating The primary folder under " + "Results/")
@@ -341,15 +353,14 @@ def save_results(train_accuracy,test_accuracy,num_arrived,num_failed,testNumber,
     #file_1.write(str(0.00) + " " + str(0.00) + " " + str(0.00) + " " + str(0.00))
     # the primary loop for results
     print("saving the results")
-    print(len(num_failed),len(num_arrived),len(test_accuracy),len(train_accuracy))
+    print(len(success),len(failed),len(num_arrived),len(num_failed))
     file_1.write(str(end_time)+"\n")
-    for i in range(len(test_accuracy)):
+    for i in range(len(failed)):
         # writing the values of cells
-        file_1.write(str(train_accuracy[i])+" "+str(test_accuracy[i])+" "+str(num_arrived[i])+" "+str(num_failed[i]))
+        file_1.write(str(success[i])+" "+str(failed[i])+" "+str(num_arrived[i])+" "+str(num_failed[i]))
         file_1.write("\n")
     # closing the file
     file_1.close()
-
 
 def print_updated_setting():
     print("Setting changes has happened the current system is\n")
@@ -362,14 +373,14 @@ def run_experiment(world_name):
         starting_time = time.time()
         print("Epoches: " + str(EPOCHES))
         if MARL_MODE == "decentralized":
-            testing_accuracy, training_accuracy, total_num_arrived, total_num_failed = decentralized_train()
+            success, failed, total_num_arrived, total_num_failed = decentralized_train()
         elif MARL_MODE == "centralized":
-            testing_accuracy, training_accuracy, total_num_arrived, total_num_failed = centralized_train()
+            success, failed, total_num_arrived, total_num_failed = centralized_train()
         # print("\nTotal progress :\n")
         # print(testing_accuracy)
         # print(training_accuracy)
         end_time = time.time() - starting_time
-        save_results(training_accuracy, testing_accuracy, total_num_arrived, total_num_failed, i, end_time)
+        save_results(success, failed, total_num_arrived, total_num_failed, i, end_time)
         print("\nTotal runtime:     \t{:.1f}".format(end_time) + " s")
 
 def set_world_name(argName):
@@ -379,6 +390,4 @@ def set_world_name(argName):
     print_updated_setting()
 
 if __name__ == '__main__':
-    for j in LOOP_THROUGH_THESE_SYSTEMS:
-        for j in LOOP_THROUGH_THESE_SYSTEMS:
-            run_experiment(j)
+   run_experiment("MORL_complex_7x7")

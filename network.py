@@ -15,10 +15,7 @@ class NeuralNet():
 
         self.session = tf.InteractiveSession()
 
-        self.hidden_activation = hid_act[hidden_activation]
-        self.output_activation = out_act[out_activation]
-        self.activation = tf.nn.sigmoid  # Activation function for hidden layer - replace as needed
-        self.optimizerFunc = tf.train.AdamOptimizer  # Optimizer function - replace as needed
+        self.set_setting(hidden_activation, out_activation)
 
         self.learning_rate = learning_rate  # learningRate
         self.input_size = input_size  # size of input layer e.g. 64
@@ -60,6 +57,14 @@ class NeuralNet():
 
         print("\nNetwork layout:\n  " + str(input_size) + "-" + str(hidden_size) + "-" + str(
             output_size) + "  with learning_rate=" + str(learning_rate) + "\n")
+
+
+    def set_setting(self,hidden_activation,out_activation):
+        self.optimizerFunc = tf.train.AdamOptimizer
+        self.hidden_activation = hid_act[hidden_activation]
+        self.output_activation = out_act[out_activation]
+        self.activation = tf.nn.sigmoid  # Activation function for hidden layer - replace as needed
+
 
     # TensorFlow Graph representing the neural network
     def mlp(self, x):

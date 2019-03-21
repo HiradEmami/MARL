@@ -59,17 +59,12 @@ class centralized_simulation():
             print("\n###############################")
             print("#   Starting a new simulation #")
             print("###############################\n")
-
-        num_steps = 0
+            num_steps = 0
         simulation_state = "running_simulation"
-        #self.world.test_randomization_prepration()
+        self.world.test_randomization_prepration()
         end_statement = "failed"
-        #if self.mode == "test":
-            #self.world.test_randomization_prepration()
         while not (simulation_state == "finished"):
-
             remain = self.number_remaining_agents()
-
             if num_steps >= self.stepLimit:
                 # If print_details is set to True print some statements
                 if self.print_details:
@@ -123,13 +118,9 @@ class centralized_simulation():
             # updating the reward
             if i.state == "arrived":
                 num_arrived += 1
-                addedReward += 0.5
-                reward.append(WIN_REWARD)
                 #self.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
             else:
                 num_failed += 1
-                addedReward -= 0.5
-                reward.append(LOSE_REWARD)
                 #self.world.centralized_meta_agent.perform_final_update(argreward=LOSE_REWARD)
 
         # result can be success or fail
@@ -172,44 +163,15 @@ class centralized_simulation():
         if self.developerMode:
             self.world.saveWorld('test')
 
-    # Function that makes all the agents that are not arrived to perform one action
+
     def do_one_step(self):
-        if (self.rewardSharing) and not (self.first_move):
-
             for i in self.world.agents:
-                if not (i.state == "arrived"):
-                    remain = self.number_remaining_agents()
-
-                    additional_reward = remain * -0.1
-                    move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
-                                                                                       argAgent=i,
-                                                                                argAdditionalReward=additional_reward)
-                    self.perform_move(argAgent=i, argMove=move)
-                    #if i.state == "arrived":
-                        #elf.world.centralized_meta_agent.perform_final_update(argreward=WIN_REWARD)
-                else:
-                    self.world.centralized_meta_agent.perform_final_update(argreward=-0.2 )
-
-        elif (self.rewardSharing) and (self.first_move):
-            self.first_move = False
-            for i in self.world.agents:
-                if not (i.state == "arrived"):
-                    additional_reward = 0
-                    move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
-                                                                                       argAgent= i,
-                                                                                argAdditionalReward=additional_reward)
-                    self.perform_move(argAgent=i, argMove=move)
-        else:
-            for i in self.world.agents:
-                if not (i.state == "arrived"):
                     move, confidence = self.world.centralized_meta_agent.make_decision(argWGrid=self.world.board,
                                                                                        argAgent= i,)
                     # continue_key = float(raw_input("Enter 1 to continue:"))
 
                     self.perform_move(argAgent=i, argMove=move)
-                    # print(move, i.positionX, i.positionY )
-                else:
-                    self.world.centralized_meta_agent.perform_final_update(argreward=-0.2)
+
     # The function for counting the number of remaining agents on the board
     def number_remaining_agents(self):
         count = 0
@@ -235,7 +197,6 @@ class centralized_simulation():
         for i in list:
             print(i)
 
-
     def get_additional_reward(self, agentID):
         agentNum = agentID - 1
         sum = 0
@@ -244,5 +205,3 @@ class centralized_simulation():
                 sum += self.previous_collected_rewards[i]
         return sum / (len(self.previous_collected_rewards) - 1)
 
-    def get_score(self):
-        return 0

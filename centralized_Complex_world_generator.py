@@ -27,7 +27,6 @@ class worldGenrator():
         self.goals = []
         self.width = 18
         self.height = 18
-
         self.world = self.generate()
 
     def generate(self, argName=WORLD_NAME):
@@ -135,5 +134,6 @@ class worldGenrator():
                 if not(saveBoard[i][j] == loadBoard[i][j]):
                     test = False
         return test
+
 if __name__ == '__main__':
     world_generator= worldGenrator()

@@ -10,7 +10,6 @@ import random
 #if Randomized_move > 0 then appropriate number of random moves are included
 RANDOMIZED_MOVE = -4
 
-
 class agent():
     # An agent is initialized using:
     #   1)   An integer "id"
@@ -75,7 +74,6 @@ class agent():
             self.communicate_goal_agents = argGoal_agents
             self.communicate_target = argTarget
 
-
     def load_networkd(self):
         self.NN.__del__()
         self.NN.loadNetwork(network_folder=self.network_folder)
@@ -100,12 +98,10 @@ class agent():
         self.communicate_goal_agents = None
         self.arrived_at_goal = 0
 
-
     # setter for the default values
     def set_default_positions(self):
         self.default_positionY = self.positionY
         self.default_positionX = self.positionX
-
 
     def set_position(self,posY,posX):
         self.positionX= posX
@@ -120,9 +116,6 @@ class agent():
 
         self.create_necessary_folders(primaryDirectory,outputDirect,second_root,final_root)
         self.network_folder=final_root
-
-
-
 
     # The Create_brain function creates the primary neural netwokr that the agent is using the given
     # parameters. The function is called after creation of the agent
@@ -140,7 +133,6 @@ class agent():
         self.goal_communication =argGoalCommunication
         self.MORL=argMORL
 
-
         if self.communication:
             self.input_size = (self.vision_x * self.vision_y * 3) + 2 + 2 + 2
             self.output_size = 10
@@ -153,7 +145,6 @@ class agent():
         else:
             self.input_size = (self.vision_x * self.vision_y *3)+ 2
             self.output_size = 5
-
 
         # defining the network
         if create_load_mode =="create":
@@ -178,7 +169,6 @@ class agent():
     def set_margines(self):
         self.marginx = (int)((self.vision_x - 1) / 2)
         self.marginY = (int)((self.vision_y - 1) / 2)
-
     # update_the vision of player
     def get_observable_board(self,argBoard):
         # if we are using developer mode we only return the entire board
@@ -206,7 +196,6 @@ class agent():
                 new_row.append(arglist[i][j])
             sliced_list.append(new_row)
         return sliced_list
-
     def pad_grid(self, argboard, width_board, height_board):
         left_right = "center"
         top_bottom = "center"
@@ -224,7 +213,6 @@ class agent():
             top_bottom = "bottom"
             argboard = self.pad_bottom(argboard)
         return argboard
-
     def pad_grid_seven(self,argboard, width_board, height_board):
         left_right = "center"
         top_bottom = "center"
@@ -301,7 +289,6 @@ class agent():
                 new_row.append(argboard[i][j])
             new_board.append(new_row)
         return new_board
-
     def pad_bottom(self, argboard):
         new_board = []
         bottom_row = []
@@ -336,7 +323,6 @@ class agent():
         goal_board= self.get_goal_grid(argGrid=observabl_grid)
         self.input_layer=self.shape_input_layer(argObstacleList=obstacle_board, argGoalList=goal_board, argAgnetList=agent_board)
         self.possible_moves, self.rejected_moves = self.get_possible_moves(argBoard=argWGrid)
-
         ####################
         #  print statement #
         ####################
@@ -346,7 +332,6 @@ class agent():
         # print("List of Possible Moves")
         # print(self.possible_moves)
         ########################
-
         # the confidance is a scalar value between 0 and 1 which determins the certainty of the agent
         self.confidence = -1
         # if the mode is set at training/developer we use the following steps
@@ -361,56 +346,33 @@ class agent():
             _, new_confidence, _ = self.get_best_move()
 
             # Calculate actual reward
-            # if we had to use rewardsharing we will get the additional reward that is provided
             if self.reward_Sharing:
                 reward = self.get_reward(additional_reward=argAdditionalReward)
             else: # Otherwise we dont have any additional reward a.k.a = 0
                 reward = self.get_reward()
-
             if not self.communication:
                 previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
             else:
                 previous_output_layer[self.previous_index] = (self.discount * new_confidence) + reward
                 other_goal = self.get_same_move_different_goal(self.previous_index)
                 previous_output_layer[other_goal]=(self.discount * new_confidence) + reward
-
             #assigining the previous reward so that simulation uses that for reward sharing if needed
-
             self.previous_reward = reward
-
             # Backpropagate actual reward
             #print("backprop for agent " +str(self.id))
             self.NN.back_propagation(previous_output_layer, input_data=previous_input_layer)
         else:
             self.state = "Progressing"
 
-        # training : this statement selects the move
-        if not (self.mode == "testing"):
-            # first we try a chance on a random move for exploration
-            if random.uniform(0,1) < self.exploration:
-                index, move = self.get_random_move()
-                output_layer = self.NN.forward_propagation(self.input_layer)
-                self.confidence = output_layer[index]
-
-                # Use network forward pass
-            else:
-                index, self.confidence, move = self.get_best_move()
-
-        # testing
+        if random.uniform(0,1) < self.exploration:
+            index, move = self.get_random_move()
+            output_layer = self.NN.forward_propagation(self.input_layer)
+            self.confidence = output_layer[index]
         else:
-            # first we try a chance on a random move for exploration
-            if random.uniform(0,1) < 0.05:
-                index, move = self.get_random_move()
-                output_layer = self.NN.forward_propagation(self.input_layer)
-                self.confidence = output_layer[index]
-            else:
-                #j ust simply forward pass to obtain the move
-                index, self.confidence, move = self.get_best_move()
-
+            index, self.confidence, move = self.get_best_move()
         # uodating counter values and previous index variable
         self.previous_index = index
         self.move_count += 1
-
         return move, self.confidence
 
     def get_reward(self,additional_reward=0):
@@ -669,17 +631,8 @@ class agent():
         #creating halt move manually:
         halt_move = (True,"halt","halt")
         #since Halting is always possible , it is automatically added to the acceptable moves
-        if len(acceptable)>=1:
-            rejected.append(halt_move)
-        else:
-            acceptable.append(halt_move)
-
-        # returning the acceptable and rejected moves
-        #if not (len(acceptable)+len(rejected)==self.output_size):
-        #    print("ERROR! the sum of accepted and rejected are bigger than output layer size:\n")
-        #    print("Output_layer: "+str(self.output_size)+" ,accepted: "+str(len(acceptable))+" ,rejected: "+str(len(rejected)))
+        acceptable.append(halt_move)
         return acceptable, rejected
-
 
     def get_obstacle_grid(self,argGrid):
         new_list=[]
@@ -690,7 +643,6 @@ class agent():
                 else:
                     new_list.append(0)
         return new_list
-
 
     def get_goal_grid(self,argGrid):
         new_list = []
@@ -721,7 +673,7 @@ class agent():
         self.scale_max = argScaleMax
         self.scale_min = argScaleMin
 
-    def scale(self,argNum, argMin, argMax, scale_max=2, scale_min=0):
+    def scale(self,argNum, argMin, argMax, scale_max=1, scale_min=0):
         return ((scale_max - scale_min) * ((argNum - argMin) / (argMax - argMin))) + scale_min
 
     #function to shape the input layer
@@ -781,13 +733,10 @@ class agent():
                 result_list.append(goal_1)
                 result_list.append(goal_2)
 
-
-
             if not len(result_list) == counter:
                 print("Failed to shape Input layer")
             else:
                 return result_list
-
 
     # function that takes the flattened array and returns the 2d array
     def convert_2d(self,argFlatList, argWidth, argHeight):

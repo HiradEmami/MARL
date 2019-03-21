@@ -1,6 +1,5 @@
 __author__='Hirad Emami Alagha - S3218139'
 
-
 class obstacle():
     def __init__(self,argType,argWidth, argHight, argX,argY, argId):
         self.type = argType
@@ -20,6 +19,7 @@ class goal():
         self.id = argId
         self.num_agent = 0
         self.capacity =( self.width * self.height )
+
     def set_new_position(self,argX,argY):
         self.x= argX
         self.y = argY

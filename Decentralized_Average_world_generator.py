@@ -38,7 +38,6 @@ class worldGenrator():
 
         self.world = self.generate()
 
-
     def generate(self,argName=WORLD_NAME):
         self.name = argName
         # creating Obstacles
@@ -133,7 +132,6 @@ class worldGenrator():
                 i.reset_agent()
             self.world.board = self.world.default_board
             print(self.world.board)
-
 
         new_world.loadWolrd(argName=self.name,argRewardSharing=REWARD_SHARING,argCommunication=COMMUNICATION,
                             argSharedPolicy=SHARED_POLICY,argMORL=MORL,argGoalcommunication=GOAL_COMMUNICATION)

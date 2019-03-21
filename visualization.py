@@ -11,16 +11,13 @@ from matplotlib import pyplot as plt
 from matplotlib import colors
 from system_utility import *
 
-
 file_name = 'centralized_complex_entire'
 primaryDirectory='Saved_Worlds'
 
 if not (file_name.startswith("world_")):
     file_name = "world_" + file_name
 
-
 path=primaryDirectory + "/" + file_name
-
 
 grid = read_world(open(path+"/world.txt",'r'))
 width = len(grid[0])
@@ -40,7 +37,6 @@ ax.xaxis.set_tick_params(labeltop='on',labelbottom="off")
 
 ax.set_xticks(np.arange(0,width, 1))
 ax.set_yticks(np.arange(0,height, 1))
-
 
 def animate(i):
     grid = read_world(open(path+"/world.txt",'r'))

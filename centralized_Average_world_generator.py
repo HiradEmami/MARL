@@ -129,5 +129,6 @@ class worldGenrator():
                 if not(saveBoard[i][j] == loadBoard[i][j]):
                     test = False
         return test
+
 if __name__ == '__main__':
     world_generator= worldGenrator()

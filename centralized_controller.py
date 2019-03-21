@@ -365,10 +365,7 @@ class controller():
         #creating halt move manually:
         halt_move = (True,"halt","halt")
         #since Halting is always possible , it is automatically added to the acceptable moves
-        if len(acceptable)>=1:
-            rejected.append(halt_move)
-        else:
-            acceptable.append(halt_move)
+        acceptable.append(halt_move)
 
         # returning the acceptable and rejected moves
         if not (len(acceptable)+len(rejected)==self.output_size):

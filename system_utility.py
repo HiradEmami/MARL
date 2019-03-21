@@ -7,8 +7,6 @@ from world import *
 from worldObject import *
 from learner import *
 
-
-
 #global variables
 primaryDirectory='Saved_Worlds'
 
@@ -46,7 +44,6 @@ def save_world(argWorldName,board, obstacles, agents, goals, width, height, argC
             else:
                 save_network_structure(outputDirect=outputDirect, argAgent=argSharedBrain)
 
-
 #the save function that specifically saves the world, this function is also used for visualization
 def save_grid(outputDirect,board):
     # saving the main grid
@@ -75,9 +72,6 @@ def save_network_structure(outputDirect,argAgent):
     file.write(str(info.discount))
 
     # file.write(str() + "\n")
-
-
-
 
 def save_info(outputDirect,agents,obstacles,goals,height,width,name,argCentralized=False):
     # saving the main info file
@@ -109,7 +103,6 @@ def save_info(outputDirect,agents,obstacles,goals,height,width,name,argCentraliz
     # closing the file
     file.close()
 
-
 def load_network_structure(file):
     # reading all the lines in the file
     lines = file.readlines()
@@ -129,8 +122,6 @@ def load_network_structure(file):
     discount=float(parameters[6])
 
     return hidden_size, learning_rate, hidden_activation, out_activation, output_size, exploration, discount
-
-
 
 # PRIVATE function for importing the info file and converting them to appropriate lists
 def read_info(argFile):
@@ -157,7 +148,6 @@ def read_info(argFile):
     sd = worldinfo[2].split("\n")
     sd1= sd[0]
     world_name=str(sd1)
-
 
     # print(len_agent,len_obstacles,len_goals,height,width)
     # print(len(lines))
@@ -188,7 +178,6 @@ def read_info(argFile):
         print("Agent :  "+str(id)+"       "+str(vision_x)+"            "+str(vision_y)+"            "
                    +str(positionX)+"              "+str(positionY)+"          "+str(step_cost)+"      "
                    +str(mode)+"\n")
-
 
         new_agent = agent(argId=id, argVisionX=vision_x, argVisionY=vision_y, argPosX=positionX, argPosY=positionY,
                           argStepCost=step_cost, argMode=mode)
@@ -242,7 +231,6 @@ def read_info(argFile):
               + str(height) + "         " + str(x) + "      " + str(y)+"\n")
 
     return world_width,world_height,agents,obstacles,goals,world_name
-
 
 # PRIVATE function for importing the world file and converting it to matrix
 def read_world(argFile):

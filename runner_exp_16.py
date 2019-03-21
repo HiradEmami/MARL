@@ -1,2 +1,0 @@
-import runner_final_experiment
-runner_final_experiment.run_experiment(world_name='intention_complex_7x7')

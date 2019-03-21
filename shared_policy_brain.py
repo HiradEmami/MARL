@@ -10,7 +10,6 @@ import random
 #if Randomized_move > 0 then appropriate number of random moves are included
 RANDOMIZED_MOVE = -4
 
-
 class Policy_agent():
     # An agent is initialized using:
     #   1)   An integer "id"
@@ -62,7 +61,6 @@ class Policy_agent():
     def set_total_agent_number(self,argNum):
         self.total_agent = argNum
 
-
     def set_communication_lists(self,argTarget,argGoal_agents):
         self.communicate_target = argTarget
         self.communicate_goal_agents = argGoal_agents
@@ -91,12 +89,10 @@ class Policy_agent():
         self.communicate_goal_agents = None
         self.arrived_at_goal = 0
 
-
     # setter for the default values
     def set_default_positions(self):
         self.default_positionY = self.positionY
         self.default_positionX = self.positionX
-
 
     def set_position(self,posY,posX):
         self.positionX= posX
@@ -111,9 +107,6 @@ class Policy_agent():
 
         self.create_necessary_folders(primaryDirectory,outputDirect,second_root,final_root)
         self.network_folder=final_root
-
-
-
 
     # The Create_brain function creates the primary neural netwokr that the agent is using the given
     # parameters. The function is called after creation of the agent
@@ -145,7 +138,6 @@ class Policy_agent():
             self.input_size = (self.vision_x * self.vision_y * 3) + 2
             self.output_size = 5
 
-
         # defining the network
         if create_load_mode =="create":
             print("Creating the network for agent "+str(self.id)+": ")
@@ -169,7 +161,6 @@ class Policy_agent():
     def set_margines(self):
         self.marginx = (int)((self.vision_x - 1) / 2)
         self.marginY = (int)((self.vision_y - 1) / 2)
-
 
     # update_the vision of player
     def get_observable_board(self,argBoard):
@@ -389,28 +380,15 @@ class Policy_agent():
         else:
             self.state = "Progressing"
 
-        # training : this statement selects the move
-        if not (self.mode == "testing"):
-            # first we try a chance on a random move for exploration
-            if random.uniform(0,1) < self.exploration:
-                index, move = self.get_random_move()
-                output_layer = self.NN.forward_propagation(self.input_layer)
-                self.confidence = output_layer[index]
+        # first we try a chance on a random move for exploration
+        if random.uniform(0,1) < self.exploration:
+            index, move = self.get_random_move()
+            output_layer = self.NN.forward_propagation(self.input_layer)
+            self.confidence = output_layer[index]
 
-                # Use network forward pass
-            else:
-                index, self.confidence, move = self.get_best_move()
-
-        # testing
+            # Use network forward pass
         else:
-            # first we try a chance on a random move for exploration
-            if random.uniform(0,1) < 0.05:
-                index, move = self.get_random_move()
-                output_layer = self.NN.forward_propagation(self.input_layer)
-                self.confidence = output_layer[index]
-            else:
-                #j ust simply forward pass to obtain the move
-                index, self.confidence, move = self.get_best_move()
+            index, self.confidence, move = self.get_best_move()
 
         # uodating counter values and previous index variable
         self.previous_index = index
@@ -763,30 +741,24 @@ class Policy_agent():
             result_list.append(node_x)
             result_list.append(node_y)
 
-            if self.communication:
-                goal_1 = self.scale(argNum=self.communicate_goal_agents[0], argMax=self.total_agent, argMin=0,
-                                    scale_max=1, scale_min=0)
-                goal_2 = self.scale(argNum=self.communicate_goal_agents[1], argMax=self.total_agent, argMin=0,
-                                    scale_max=1, scale_min=0)
-                result_list.append(goal_1)
-                result_list.append(goal_2)
 
-                target_1 = self.scale(argNum=self.communicate_target[0], argMax=self.total_agent, argMin=0,
-                                      scale_max=1, scale_min=0)
-                target_2 = self.scale(argNum=self.communicate_target[1], argMax=self.total_agent, argMin=0,
-                                      scale_max=1, scale_min=0)
-                # print(self.communicate_goal_agents[0],self.communicate_goal_agents[1],
-                # self.communicate_target[1],self.communicate_target[1])
-                result_list.append(target_1)
-                result_list.append(target_2)
+            goal_1 = self.scale(argNum=self.communicate_goal_agents[0], argMax=self.total_agent, argMin=0,
+                                scale_max=1, scale_min=0)
+            goal_2 = self.scale(argNum=self.communicate_goal_agents[1], argMax=self.total_agent, argMin=0,
+                                scale_max=1, scale_min=0)
+            result_list.append(goal_1)
+            result_list.append(goal_2)
 
-            elif self.goal_communication or self.MORL:
-                goal_1 = self.scale(argNum=self.communicate_goal_agents[0], argMax=self.total_agent, argMin=0,
-                                    scale_max=1, scale_min=0)
-                goal_2 = self.scale(argNum=self.communicate_goal_agents[1], argMax=self.total_agent, argMin=0,
-                                    scale_max=1, scale_min=0)
-                result_list.append(goal_1)
-                result_list.append(goal_2)
+            target_1 = self.scale(argNum=self.communicate_target[0], argMax=self.total_agent, argMin=0,
+                                  scale_max=1, scale_min=0)
+            target_2 = self.scale(argNum=self.communicate_target[1], argMax=self.total_agent, argMin=0,
+                                  scale_max=1, scale_min=0)
+            # print(self.communicate_goal_agents[0],self.communicate_goal_agents[1],
+            # self.communicate_target[1],self.communicate_target[1])
+            result_list.append(target_1)
+            result_list.append(target_2)
+
+
 
             if not len(result_list) == counter:
                 print("Failed to shape Input layer")
